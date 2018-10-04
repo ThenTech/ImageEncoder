@@ -1,0 +1,414 @@
+JPEG Encoder by William Thenaers v0.0.0.1
+
+Input settings:
+-------------------------
+   decfile = decoded.raw
+   encfile = encoded.enc
+    height = 512
+   logfile = log.txt
+ quantfile = matrix.txt
+   rawfile = input.raw
+       rle = 1
+     width = 512
+
+Quantization matrix:
+-------------------------
+   2   4   8  16
+   4   4   8  16
+   8   8  32  64
+  16  32  64 128
+
+2018-10-04 01:13:16 TODO Do work
+
+----------------------------------------------------------------------
+
+JPEG Encoder by William Thenaers v0.0.0.1
+
+Input settings:
+-------------------------
+   decfile = decoded.raw
+   encfile = encoded.enc
+    height = 512
+   logfile = log.txt
+ quantfile = matrix.txt
+   rawfile = input.raw
+       rle = 1
+     width = 512
+
+Quantization matrix:
+-------------------------
+   2   4   8  16
+   4   4   8  16
+   8   8  32  64
+  16  32  64 128
+
+2018-10-04 01:13:40 TODO Do work
+JPEG Encoder by William Thenaers v0.0.0.1
+
+Input settings:
+-------------------------
+   decfile = decoded.raw
+   encfile = encoded.enc
+    height = 512
+   logfile = log.txt
+ quantfile = matrix.txt
+   rawfile = input.raw
+       rle = 1
+     width = 512
+
+Quantization matrix:
+-------------------------
+   2   4   8  16
+   4   4   8  16
+   8   8  32  64
+  16  32  64 128
+
+2018-10-04 01:38:12 TODO Do work
+JPEG Encoder by William Thenaers v0.0.0.1
+
+Input settings:
+-------------------------
+   decfile = decoded.raw
+   encfile = encoded.enc
+    height = 512
+   logfile = log.txt
+ quantfile = matrix.txt
+   rawfile = input.raw
+       rle = 1
+     width = 512
+
+Quantization matrix:
+-------------------------
+   2   4   8  16
+   4   4   8  16
+   8   8  32  64
+  16  32  64 128
+
+2018-10-04 01:40:18 TODO Do work
+JPEG Encoder by William Thenaers v0.0.0.1
+
+Input settings:
+-------------------------
+   decfile = decoded.raw
+   encfile = encoded.enc
+    height = 512
+   logfile = log.txt
+ quantfile = matrix.txt
+   rawfile = input.raw
+       rle = 1
+     width = 512
+
+Quantization matrix:
+-------------------------
+   2   4   8  16
+   4   4   8  16
+   8   8  32  64
+  16  32  64 128
+
+2018-10-04 01:54:42 TODO Do work
+2018-10-04 01:54:42 FileReadException: Cannot read from file: input.raw
+JPEG Encoder by William Thenaers v0.0.0.1
+
+Input settings:
+-------------------------
+   decfile = decoded.raw
+   encfile = encoded.enc
+    height = 512
+   logfile = log.txt
+ quantfile = matrix.txt
+   rawfile = input.raw
+       rle = 1
+     width = 512
+
+Quantization matrix:
+-------------------------
+   2   4   8  16
+   4   4   8  16
+   8   8  32  64
+  16  32  64 128
+
+2018-10-04 01:54:59 TODO Do work
+2018-10-04 01:54:59 FileReadException: Cannot read from file: input.raw
+JPEG Encoder by William Thenaers v0.0.0.1
+
+Input settings:
+-------------------------
+   decfile = decoded.raw
+   encfile = encoded.enc
+    height = 512
+   logfile = log.txt
+ quantfile = matrix.txt
+   rawfile = input.raw
+       rle = 1
+     width = 512
+
+Quantization matrix:
+-------------------------
+   2   4   8  16
+   4   4   8  16
+   8   8  32  64
+  16  32  64 128
+
+2018-10-04 01:57:49 TODO Do work
+2018-10-04 01:57:49 FileReadException: Cannot read from file: input.raw
+JPEG Encoder by William Thenaers v0.0.0.1
+
+Input settings:
+-------------------------
+   decfile = decoded.raw
+   encfile = encoded.enc
+    height = 512
+   logfile = log.txt
+ quantfile = matrix.txt
+   rawfile = input.raw
+       rle = 1
+     width = 512
+
+Quantization matrix:
+-------------------------
+   2   4   8  16
+   4   4   8  16
+   8   8  32  64
+  16  32  64 128
+
+2018-10-04 02:38:53 TODO Do work
+2018-10-04 02:38:53 FileReadException: Cannot read from file: input.raw
+JPEG Encoder by William Thenaers v0.0.0.1
+
+Input settings:
+-------------------------
+   decfile = decoded.raw
+   encfile = encoded.enc
+    height = 512
+   logfile = log.txt
+ quantfile = matrix.txt
+   rawfile = input.raw
+       rle = 1
+     width = 512
+
+Quantization matrix:
+-------------------------
+   2   4   8  16
+   4   4   8  16
+   8   8  32  64
+  16  32  64 128
+
+2018-10-04 02:39:54 TODO Do work
+2018-10-04 02:39:54 FileReadException: Cannot read from file: input.raw
+JPEG Encoder by William Thenaers v0.0.0.1
+
+Input settings:
+-------------------------
+   decfile = decoded.raw
+   encfile = encoded.enc
+    height = 512
+   logfile = log.txt
+ quantfile = matrix.txt
+   rawfile = input.raw
+       rle = 1
+     width = 512
+
+Quantization matrix:
+-------------------------
+   2   4   8  16
+   4   4   8  16
+   8   8  32  64
+  16  32  64 128
+
+2018-10-04 02:40:06 TODO Do work
+
+----------------------------------------------------------------------
+
+JPEG Encoder by William Thenaers v0.0.0.1
+
+Input settings:
+-------------------------
+   decfile = decoded.raw
+   encfile = encoded.enc
+    height = 512
+   logfile = log.txt
+ quantfile = matrix.txt
+   rawfile = input.raw
+       rle = 1
+     width = 512
+
+Quantization matrix:
+-------------------------
+   2   4   8  16
+   4   4   8  16
+   8   8  32  64
+  16  32  64 128
+
+2018-10-04 02:43:18 TODO Do work
+2018-10-04 02:43:18 [Encoder] Processing image...
+2018-10-04 02:43:18 [ImageProcessor] Processing image...
+2018-10-04 02:43:18 [ImageProcessor] Saved file at: encoded.enc
+
+----------------------------------------------------------------------
+
+JPEG Encoder by William Thenaers v0.0.0.1
+
+Input settings:
+-------------------------
+   decfile = decoded.raw
+   encfile = encoded.enc
+    height = 512
+   logfile = log.txt
+ quantfile = matrix.txt
+   rawfile = input.raw
+       rle = 1
+     width = 512
+
+Quantization matrix:
+-------------------------
+   2   4   8  16
+   4   4   8  16
+   8   8  32  64
+  16  32  64 128
+
+2018-10-04 02:43:43 TODO Do work
+2018-10-04 02:43:43 [Encoder] Processing image...
+2018-10-04 02:43:43 [ImageProcessor] Processing image...
+JPEG Encoder by William Thenaers v0.0.0.1
+
+Input settings:
+-------------------------
+   decfile = decoded.raw
+   encfile = encoded.enc
+    height = 512
+   logfile = log.txt
+ quantfile = matrix.txt
+   rawfile = input.raw
+       rle = 1
+     width = 512
+
+Quantization matrix:
+-------------------------
+   2   4   8  16
+   4   4   8  16
+   8   8  32  64
+  16  32  64 128
+
+2018-10-04 02:46:35 TODO Do work
+2018-10-04 02:46:35 [Encoder] Processing image...
+2018-10-04 02:46:35 [ImageProcessor] Processing image...
+2018-10-04 02:47:39 [ImageProcessor] Saved file at: encoded.enc
+
+----------------------------------------------------------------------
+
+JPEG Encoder by William Thenaers v0.0.0.1
+
+Input settings:
+-------------------------
+   decfile = decoded.raw
+   encfile = encoded.enc
+    height = 512
+   logfile = log.txt
+ quantfile = matrix.txt
+   rawfile = input.raw
+       rle = 1
+     width = 512
+
+Quantization matrix:
+-------------------------
+   2   4   8  16
+   4   4   8  16
+   8   8  32  64
+  16  32  64 128
+
+2018-10-04 02:48:35 TODO Do work
+2018-10-04 02:48:35 [Encoder] Processing image...
+2018-10-04 02:48:35 [ImageProcessor] Processing image...
+2018-10-04 02:48:35 [ImageProcessor] Saved file at: encoded.enc
+
+----------------------------------------------------------------------
+
+JPEG Encoder by William Thenaers v0.0.0.1
+
+Input settings:
+-------------------------
+   decfile = decoded.raw
+   encfile = encoded.enc
+    height = 512
+   logfile = log.txt
+ quantfile = matrix.txt
+   rawfile = input.raw
+       rle = 1
+     width = 512
+
+Quantization matrix:
+-------------------------
+   2   4   8  16
+   4   4   8  16
+   8   8  32  64
+  16  32  64 128
+
+2018-10-04 02:49:18 [Encoder] Processing image...
+2018-10-04 02:49:18 TODO Do work
+2018-10-04 02:49:18 [ImageProcessor] Processing image...
+2018-10-04 02:49:18 [ImageProcessor] Saved file at: encoded.enc
+
+----------------------------------------------------------------------
+
+JPEG Encoder/Decoder by William Thenaers v0.0.0.1
+
+Input settings:
+-------------------------
+   decfile = decoded.raw
+   encfile = encoded.enc
+    height = 512
+   logfile = log.txt
+ quantfile = matrix.txt
+   rawfile = input.raw
+       rle = 1
+     width = 512
+
+Quantization matrix:
+-------------------------
+   2   4   8  16
+   4   4   8  16
+   8   8  32  64
+  16  32  64 128
+
+2018-10-04 02:49:37 [Encoder] Processing image...
+2018-10-04 02:49:37 TODO Do work
+2018-10-04 02:49:37 [ImageProcessor] Processing image...
+2018-10-04 02:49:37 [ImageProcessor] Saved file at: encoded.enc
+2018-10-04 02:49:37 [Decoder] Processing image...
+2018-10-04 02:49:37 TODO Do work
+2018-10-04 02:49:37 [ImageProcessor] Processing image...
+2018-10-04 02:49:37 [ImageProcessor] Saved file at: decoded.raw
+
+----------------------------------------------------------------------
+
+JPEG Encoder/Decoder by William Thenaers v0.0.0.1
+
+Input settings:
+-------------------------
+   decfile = decoded.raw
+   encfile = encoded.enc
+    height = 512
+   logfile = log.txt
+ quantfile = matrix.txt
+   rawfile = input.raw
+       rle = 1
+     width = 512
+
+Quantization matrix:
+-------------------------
+   2   4   8  16
+   4   4   8  16
+   8   8  32  64
+  16  32  64 128
+
+2018-10-04 02:54:12 [Encoder] Processing image...
+2018-10-04 02:54:12 TODO Do work
+2018-10-04 02:54:12 [ImageProcessor] Processing image...
+2018-10-04 02:54:12 [ImageProcessor] Saved file at: encoded.enc
+2018-10-04 02:54:12 [Decoder] Processing image...
+2018-10-04 02:54:12 TODO Do work
+2018-10-04 02:54:12 [ImageProcessor] Processing image...
+2018-10-04 02:54:12 [ImageProcessor] Saved file at: decoded.raw
+
+----------------------------------------------------------------------
+

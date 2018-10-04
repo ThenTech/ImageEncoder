@@ -1,0 +1,31 @@
+JPEG Encoder/Decoder by William Thenaers v0.0.0.1
+
+Input settings:
+-------------------------
+   decfile = decoded.raw
+   encfile = encoded.enc
+    height = 512
+   logfile = log.txt
+ quantfile = matrix.txt
+   rawfile = input.raw
+       rle = 1
+     width = 512
+
+Quantization matrix:
+-------------------------
+   2   4   8  16
+   4   4   8  16
+   8   8  32  64
+  16  32  64 128
+
+2018-10-04 02:56:09 [Encoder] Processing image...
+2018-10-04 02:56:09 TODO Do work
+2018-10-04 02:56:09 [ImageProcessor] Processing image...
+2018-10-04 02:56:09 [ImageProcessor] Saved file at: encoded.enc
+2018-10-04 02:56:09 [Decoder] Processing image...
+2018-10-04 02:56:09 TODO Do work
+2018-10-04 02:56:09 [ImageProcessor] Processing image...
+2018-10-04 02:56:09 [ImageProcessor] Saved file at: decoded.raw
+
+----------------------------------------------------------------------
+
