@@ -14,8 +14,8 @@
     #include <cxxabi.h>
 #endif
 
-#ifndef __cplusplus
-#error A C++ compiler is required!
+#if __cplusplus < 201703L
+#error A C++17 compiler is required!
 #endif
 
 #include "Exceptions.hpp"
@@ -136,6 +136,25 @@ namespace std {
 }
 
 namespace util {
+    /**
+     * \brief  Find First Set
+     *         This function identifies the least significant index or position of the
+     *         bits set to one in the word.
+     *
+     * \param  value
+     *      Value to find least significant index
+     * \retval bitIndex
+     *      Index of least significat bit at one
+     */
+    [[maybe_unused]] static inline uint8_t ffs(uint32_t value ) {;
+        return uint8_t(32 - __builtin_clz(value));
+    }
+
+    /**
+     * @brief   Cast enum type to underlining data type.
+     * @param   e
+     *      The enum value to cast.
+     */
     template <typename E>
     constexpr inline auto to_underlying(E e) noexcept {
         return static_cast<std::underlying_type_t<E>>(e);
@@ -262,6 +281,144 @@ namespace util {
         }
 
         file.close();
+    }
+
+    /*
+     *	Overloaded methods to allocate an array of T of size x, y, z.
+     */
+    /**	\brief	Allocate an object of type T on the heap using `new T()`.
+     *          Any argument will be passed down to the ctor of T.
+     *
+     *	\tparam	T
+     *		The type of object to allocate.
+     *	\return
+     *		A pointer to the newly allocated object.
+     */
+    template <class T, class ... Type>
+    [[maybe_unused]] static inline T* allocVar(Type ... args) {
+        return new T(args...);
+    }
+
+    /**	\brief	Deallocate an object of type T that was allocated using SysUtils::allocVar<T>().
+     *
+     *	\tparam	T
+     *		The type of object to deallocate.
+     *	\param	*v
+     *		A pointer to the object to deallocate.
+     */
+    template <class T>
+    [[maybe_unused]] static inline void deallocVar(T* v) {
+        delete v;
+    }
+
+    /**	\brief	Allocate an array of objects of type T and length x on the heap using `new T[x]()`.
+     *
+     *	\tparam	T
+     *		The type of object to allocate.
+     *	\param	x
+     *		The length of the array in the first dimension.
+     *	\return
+     *		A pointer to the newly allocated object.
+     */
+    template <class T>
+    [[maybe_unused]] static inline T* allocArray(size_t x) {
+        return new T[x]();
+    }
+
+    /**	\brief	Deallocate an array of type T that was allocated using SysUtils::allocArray<T>(size_t).
+     *
+     *	\tparam	T
+     *		The type of object to deallocate.
+     *	\param	*a
+     *		A pointer to the object to deallocate.
+     */
+    template <class T>
+    [[maybe_unused]] static inline void deallocArray(T* a) {
+        delete[] a;
+    }
+
+    /**	\brief	Allocate y arrays of objects of type T and length x on the heap.
+     *
+     *	\tparam	T
+     *		The type of object to allocate.
+     *	\param	x
+     *		The length of the array in the first dimension.
+     *	\param	y
+     *		The length of the array in the second dimension.
+     *	\return
+     *		A pointer to the newly allocated object.
+     */
+    template <class T>
+    [[maybe_unused]] static inline T** allocArray(size_t x, size_t y) {
+        T **arr = new T*[x];
+        for(size_t i = 0; i < x; i++) arr[i] = util::allocArray<T>(y);
+        return arr;
+    }
+
+    /**	\brief	Deallocate an array of type T that was allocated using SysUtils::allocArray<T>(size_t, size_t).
+     *
+     *	\tparam	T
+     *		The type of object to deallocate.
+     *	\param	**a
+     *		A pointer to the object to deallocate.
+     *	\param	y
+     *		The length of the array in the second dimension.
+     */
+    template <class T>
+    [[maybe_unused]] static inline void deallocArray(T** a, size_t y) {
+        for(size_t i = 0; i < y; i++) util::deallocArray(a[i]);
+        util::deallocArray(a);
+    }
+
+    /**	\brief	Allocate z arrays of y arrays of objects of type T and length x on the heap.
+     *
+     *	\tparam	T
+     *		The type of object to allocate.
+     *	\param	x
+     *		The length of the array in the first dimension.
+     *	\param	y
+     *		The length of the array in the second dimension.
+     *	\param	z
+     *		The length of the array in the third dimension.
+     *	\return
+     *		A pointer to the newly allocated object.
+     */
+    template <class T>
+    [[maybe_unused]] static inline T*** allocArray(size_t x, size_t y, size_t z) {
+        T ***arr = new T**[x];
+        for(size_t i = 0; i < x; i++) arr[i] = util::allocArray<T>(y, z);
+        return arr;
+    }
+
+    /**	\brief	Deallocate an array of type T that was allocated using SysUtils::allocArray<T>(size_t, size_t, size_t).
+     *
+     *	\tparam	T
+     *		The type of object to deallocate.
+     *	\param	***a
+     *		A pointer to the object to deallocate.
+     *	\param	y
+     *		The length of the array in the second dimension.
+     *	\param	z
+     *		The length of the array in the third dimension.
+     */
+    template <class T>
+    [[maybe_unused]] static inline void deallocArray(T*** a, size_t y, size_t z) {
+        for(size_t i = 0; i < z; i++) util::deallocArray(a[i], y);
+        util::deallocArray(a);
+    }
+
+    /**	\brief	Deallocate a vector containing pointers to type T,
+     *			that was allocated using SysUtils::allocVar<T>() and then filled by push_back(SysUtils::allocVar<T>()).
+     *
+     *	\tparam	T
+     *		The type of pointer to an object inside the std::vector to deallocate.
+     *	\param	*v
+     *		A pointer to the object to deallocate.
+     */
+    template <class T>
+    [[maybe_unused]] static inline void deallocVector(std::vector<T*> *v) {
+        for (T *i : *v) util::deallocVar(i);
+        util::deallocVar(v);
     }
 }
 

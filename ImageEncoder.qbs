@@ -9,6 +9,8 @@ Project {
         files: [
             "BitStream.cpp",
             "BitStream.hpp",
+            "Block.cpp",
+            "Block.hpp",
             "ConfigReader.cpp",
             "ConfigReader.hpp",
             "Decoder.cpp",
@@ -22,10 +24,10 @@ Project {
             "Logger.hpp",
             "MatrixReader.cpp",
             "MatrixReader.hpp",
+            "algo.cpp",
+            "algo.hpp",
             "main.cpp",
             "main.hpp",
-            "matrix.txt",
-            "settings.conf",
             "utils.hpp",
         ]
 

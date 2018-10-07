@@ -1,7 +1,4 @@
 #include "BitStream.hpp"
-#include <cstring>
-#include <cmath>
-#include <algorithm>
 
 namespace util {
     const uint8_t bitmasks[] = {0, 128, 192, 224, 240, 248, 252, 254};
@@ -38,8 +35,9 @@ namespace util {
 
     ////////////////////////////////////////////////////////////////////////////////////
 
-    BitStreamWriter::BitStreamWriter(size_t s) : BitStream(nullptr, s, 0, true) {
-        this->buffer = new uint8_t[this->size];
+    BitStreamWriter::BitStreamWriter(size_t s)
+        : BitStream(util::allocArray<uint8_t>(s), s, 0, true)
+    {
         //printf("Allocated buffer of size: %d\n", s);
     }
 

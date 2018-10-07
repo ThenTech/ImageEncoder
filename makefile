@@ -15,7 +15,9 @@ LIBS =
 
 # Use a g++ executable with c++17 support (see install_g++.sh)
 CC = g++-7
-CFLAGS = -std=c++17 -Wall -O3 -Wl,--strip-all
+
+# Extra flags to strip unused symbols: -Wl,--strip-all,--gc-sections -fdata-sections -ffunction-sections
+CFLAGS = -std=c++17 -Wall -O3 -Wl,--strip-all,--gc-sections -fdata-sections -ffunction-sections
 
 # Default target
 TARGET   = $(TG_ENCODER)
@@ -63,7 +65,7 @@ HEADERS = $(wildcard *.hpp)
 
 # Call compiler for linking
 compile: $(OBJECTS)
-	@$(CC) $(OBJECTS) -Wall $(LIBS) -o $(OUTPUT)/$(TARGET)
+	@$(CC) $(OBJECTS) -Wall $(CFLAGS) $(LIBS) -o $(OUTPUT)/$(TARGET)
 
 # Clean targets
 cleantg:

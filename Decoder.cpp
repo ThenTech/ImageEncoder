@@ -1,13 +1,25 @@
 #include "Decoder.hpp"
 #include "Logger.hpp"
 
+#include <cassert>
 
-dc::Decoder::Decoder(const std::string &source_file, const std::string &dest_file,
-                     const size_t &width, const size_t &height, const size_t &rle,
-                     MatrixReader<dc::DefaultMatrixSize> &m)
-    : ImageProcessor(source_file, dest_file), width(width), height(height), rle(rle), quant_m(m)
+dc::Decoder::Decoder(const std::string &source_file, const std::string &dest_file)
+    : ImageProcessor(source_file, dest_file)
 {
+    // TODO Get decoding info like (this->quant_m, this->use_rle, width, height)
+    //      from the raw bytestream instead.
 
+    assert(this->width  % dc::BlockSize == 0);
+    assert(this->height % dc::BlockSize == 0);
+
+    const size_t hdrlen = this->reader->get_position() / 8u;
+    const size_t datlen = this->reader->get_size() - hdrlen;
+
+    assert(datlen == (this->width * this->height));
+
+    util::Logger::Write("[Decoder] Loaded image with "
+                        + std::to_string(hdrlen) + " bytes header and "
+                        + std::to_string(datlen) + " bytes data.");
 }
 
 dc::Decoder::~Decoder(void) {
@@ -15,10 +27,14 @@ dc::Decoder::~Decoder(void) {
 }
 
 bool dc::Decoder::process(void) {
+    bool success = true;
+
     util::Logger::Write("[Decoder] Processing image...");
 
-    // TODO
+    success = ImageProcessor::process();
+
+    // TODO Write decoder
     util::Logger::Write("TODO Do work");
 
-    return ImageProcessor::process();
+    return success;
 }

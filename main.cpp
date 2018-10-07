@@ -41,34 +41,33 @@ int main(int argc, char *argv[]) {
     util::Logger::Write("-------------------------", false);
     util::Logger::Write(c.toString(), false);
 
-
-    dc::MatrixReader<dc::DefaultMatrixSize> m;
-
-    if (!m.read(c.getValue(dc::Setting::quantfile))) {
-        return 4;
-    }
-
-    util::Logger::Write("Quantization matrix:", false);
-    util::Logger::Write("-------------------------", false);
-    util::Logger::Write(m.toString(), false);
-
-    const std::string rawfile = c.getValue(dc::Setting::rawfile),
-                      encfile = c.getValue(dc::Setting::encfile),
+    const std::string encfile = c.getValue(dc::Setting::encfile),
                       decfile = c.getValue(dc::Setting::decfile);
-    size_t width, height, rle;
-
-    try {
-        width  = util::lexical_cast<size_t>(c.getValue(dc::Setting::width).c_str());
-        height = util::lexical_cast<size_t>(c.getValue(dc::Setting::height).c_str());
-        rle    = util::lexical_cast<size_t>(c.getValue(dc::Setting::rle).c_str());
-    } catch (Exceptions::CastingException const& e) {
-        util::Logger::Write(e.getMessage());
-        return 5;
-    }
-
     bool success = true;
 
     #ifdef ENCODER
+        dc::MatrixReader<> m;
+
+        if (!m.read(c.getValue(dc::Setting::quantfile))) {
+            return 4;
+        }
+
+        util::Logger::Write("Quantization matrix:", false);
+        util::Logger::Write("-------------------------", false);
+        util::Logger::Write(m.toString(), false);
+
+        const std::string rawfile = c.getValue(dc::Setting::rawfile);
+        uint16_t width, height, rle;
+
+        try {
+            width  = util::lexical_cast<uint16_t>(c.getValue(dc::Setting::width).c_str());
+            height = util::lexical_cast<uint16_t>(c.getValue(dc::Setting::height).c_str());
+            rle    = util::lexical_cast<uint16_t>(c.getValue(dc::Setting::rle).c_str());
+        } catch (Exceptions::CastingException const& e) {
+            util::Logger::Write(e.getMessage());
+            return 5;
+        }
+
         dc::Encoder enc(rawfile, encfile, width, height, rle, m);
 
         if ((success = enc.process())) {
@@ -80,7 +79,7 @@ int main(int argc, char *argv[]) {
 
     #ifdef DECODER
         if (success) {
-            dc::Decoder dec(encfile, decfile, width, height, rle, m);
+            dc::Decoder dec(encfile, decfile);
 
             if (dec.process()) {
                 dec.saveResult();

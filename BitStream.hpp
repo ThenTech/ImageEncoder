@@ -5,6 +5,8 @@
 #include <cstdio>
 #include <fstream>
 
+#include "utils.hpp"
+
 namespace util {
 
     class BitStream {
@@ -24,40 +26,40 @@ namespace util {
                 }
             }
 
-            uint8_t* get_buffer() {
+            inline uint8_t* get_buffer(void) {
                 return this->buffer;
             }
 
-            const uint8_t* get_buffer() const {
+            inline const uint8_t* get_buffer() const {
                 return this->buffer;
             }
 
-            size_t get_size() const {
+            inline size_t get_size(void) const {
                 return this->size;
             }
 
-            void set_managed(bool m) {
+            inline void set_managed(bool m) {
                 this->managed = m;
             }
 
-            void set_position(size_t p) {
+            inline void set_position(size_t p) {
                 this->position = p;
             }
 
-            size_t get_position() const {
+            inline size_t get_position(void) const {
                 return this->position;
             }
 
-            void reset() {
+            inline void reset(void) {
                 this->set_position(0);
             }
 
             /**
              * Deallocate the buffer and reset all fields
              */
-            void clear() {
+            void clear(void) {
                 if (this->buffer != nullptr) {
-                    delete[] buffer;
+                    util::deallocArray(this->buffer);
                 }
 
                 this->position = 0;

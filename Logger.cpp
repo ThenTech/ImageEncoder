@@ -56,9 +56,9 @@ void util::Logger::Write(const std::string &text, bool timestamp) {
             std::cout << text << std::endl;
 
             if (timestamp) {
-                auto t = std::time(nullptr);
-                auto tm = *std::localtime(&t);
-                util::Logger::instance.log_file << std::put_time(&tm, "%Y-%m-%d %H:%M:%S")
+                auto t  = std::time(nullptr);
+                auto tm = std::localtime(&t);
+                util::Logger::instance.log_file << std::put_time(tm, "%Y-%m-%d %H:%M:%S")
                                                 << " ";
             }
 

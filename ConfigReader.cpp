@@ -30,12 +30,12 @@ static bool ReadInputLine(FILE *fi, std::string &line) {
 
 	char str[MAXLEN];
 
-    if (fgets(str, MAXLEN - 1, fi) == nullptr) {
+    if (std::fgets(str, MAXLEN - 1, fi) == nullptr) {
 		return false;
     }
 
     str[MAXLEN - 1] = '\0';
-    size_t len = strlen(str);
+    size_t len = std::strlen(str);
 
     while (len > 0 && (str[len - 1] == '\r' || str[len - 1] == '\n')) {
 		len--;
@@ -55,7 +55,7 @@ dc::ConfigReader::~ConfigReader() {}
 bool dc::ConfigReader::read(const std::string &fileName) {
     this->clear();
 
-	FILE *pFile = fopen(fileName.c_str(), "rt");
+    FILE *pFile = std::fopen(fileName.c_str(), "rt");
 
     if (pFile == nullptr) {
         this->m_errStr = std::string("Can't open file");
@@ -70,7 +70,7 @@ bool dc::ConfigReader::read(const std::string &fileName) {
 
             if (s == std::string::npos) {
                 this->m_errStr = std::string("Can't find '=' in line");
-				fclose(pFile);
+                std::fclose(pFile);
 				return false;
 			}
 
@@ -79,13 +79,13 @@ bool dc::ConfigReader::read(const std::string &fileName) {
 
             if (key.length() == 0) {
                 this->m_errStr = std::string("Detected an empty key");
-				fclose(pFile);
+                std::fclose(pFile);
 				return false;
 			}
 
             if (this->m_keyValues.find(key) != this->m_keyValues.end()) {
                 this->m_errStr = std::string("Key '" + key + "' was found more than once!");
-				fclose(pFile);
+                std::fclose(pFile);
 				return false;
 			}
 
@@ -93,7 +93,7 @@ bool dc::ConfigReader::read(const std::string &fileName) {
 		}
 	}
 
-	fclose(pFile);
+    std::fclose(pFile);
 	return true;
 }
 
