@@ -17,7 +17,7 @@ dc::Decoder::Decoder(const std::string &source_file, const std::string &dest_fil
 
     assert(datlen == (this->width * this->height));
 
-    util::Logger::Write("[Decoder] Loaded image with "
+    util::Logger::WriteLn("[Decoder] Loaded image with "
                         + std::to_string(hdrlen) + " bytes header and "
                         + std::to_string(datlen) + " bytes data.");
 }
@@ -29,12 +29,12 @@ dc::Decoder::~Decoder(void) {
 bool dc::Decoder::process(void) {
     bool success = true;
 
-    util::Logger::Write("[Decoder] Processing image...");
+    util::Logger::WriteLn("[Decoder] Processing image...");
 
     success = ImageProcessor::process();
 
     // TODO Write decoder
-    util::Logger::Write("TODO Do work");
+    util::Logger::WriteLn("TODO Do work");
 
     return success;
 }

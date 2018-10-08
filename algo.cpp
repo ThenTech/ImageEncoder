@@ -1,11 +1,16 @@
 #include "algo.hpp"
 
 #ifndef _USE_MATH_DEFINES
-#define _USE_MATH_DEFINES
+    #define _USE_MATH_DEFINES
 #endif
+
+#include "utils.hpp"
 
 #include <cmath>
 #include <cassert>
+
+#if   defined(ALGO_USE_DCT_LEE)
+// From: https://www.nayuki.io/page/fast-discrete-cosine-transform-algorithms
 
 // DCT type II, unscaled. Algorithm by Byeong Gi Lee, 1984.
 // See:  http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.118.3056&rep=rep1&type=pdf#page=34
@@ -67,51 +72,103 @@ void algo::transformDCT(double vec[], size_t len) {
     forwardTransformDCT(vec, temp.data(), len);
 }
 
-void algo::transformDCT(std::vector<double> &vec) {
-    algo::transformDCT(vec.data(), vec.size());
-}
-
 void algo::transformDCTinverse(double vec[], size_t len) {
     assert(len > 0 && (len & (len - 1)) == 0); // Length is power of 2
     vec[0] /= 2.0;
     std::vector<double> temp(len);
     inverseTransformDCT(vec, temp.data(), len);
 }
-
-void algo::transformDCTinverse(std::vector<double> &vec) {
-    algo::transformDCTinverse(vec.data(), vec.size());
-}
-
-
-
+#elif defined(ALGO_USE_DCT_NAIVE)
 /**********************************************
  *  Naive approach, standard from wiki.
  **********************************************/
+// From: https://www.nayuki.io/page/fast-discrete-cosine-transform-algorithms
 
-void algo::naiveTransformDCT(double vec[], size_t len) {
+void algo::transformDCT(double vec[], size_t len) {
     std::vector<double> temp(len);
     const double factor = M_PI / len;
 
     for (size_t i = 0; i < len; i++) {
         double sum = 0;
-        for (size_t j = 0; j < len; j++)
+
+        for (size_t j = 0; j < len; j++) {
             sum += vec[j] * std::cos((j + 0.5) * i * factor);
+        }
+
         temp[i] = sum;
     }
 
     std::copy(temp.begin(), temp.end(), vec);
 }
 
-void algo::naiveTransformDCTinverse(double vec[], size_t len) {
+void algo::transformDCTinverse(double vec[], size_t len) {
     std::vector<double> temp(len);
     const double factor = M_PI / len;
 
     for (size_t i = 0; i < len; i++) {
-        double sum = vec[0] / 2;
-        for (size_t j = 1; j < len; j++)
+        double sum = vec[0] / 2.0;
+
+        for (size_t j = 1; j < len; j++) {
             sum += vec[j] * std::cos(j * (i + 0.5) * factor);
+        }
+
         temp[i] = sum;
     }
 
     std::copy(temp.begin(), temp.end(), vec);
 }
+#else
+/**********************************************
+ *  Naive approach from iPython notebook.
+ **********************************************/
+double C(size_t i) {
+//    return i == 0 ? M_SQRT2 / 2.0 : 1.0;  // Wrong?
+    return i == 0 ? 0.5 : M_SQRT1_2; // voor size=4 of len=16
+}
+
+void algo::transformDCT(double vec[], size_t len) {
+    double *temp        = util::allocArray<double>(len);
+    const size_t size   = size_t(std::sqrt(len));
+    const double factor = M_PI_2 / double(size);
+
+    for (size_t u = 0; u < size; u++) {
+        for (size_t v = 0; v < size; v++) {
+            for (size_t i = 0; i < size; i++) {
+                for (size_t j = 0; j < size; j++) {
+                    temp[u * size + v] += std::cos(double(2.0 * i + 1.0) * u * factor)
+                                        * std::cos(double(2.0 * j + 1.0) * v * factor)
+                                        * vec[i * size + j];
+                }
+            }
+
+//            temp[u * size + v] *= C(u) * C(v) / 2.0;  // Wrong? Why extra div by 4?
+            temp[u * size + v] *= C(u) * C(v);
+        }
+    }
+
+    std::copy_n(temp, len, vec);
+    util::deallocArray(temp);
+}
+
+void algo::transformDCTinverse(double vec[], size_t len) {
+    double *temp        = util::allocArray<double>(len);
+    const size_t size   = size_t(std::sqrt(len));
+    const double factor = M_PI_2 / double(size);
+
+    for (size_t u = 0; u < size; u++) {
+        for (size_t v = 0; v < size; v++) {
+            for (size_t i = 0; i < size; i++) {
+                for (size_t j = 0; j < size; j++) {
+                    temp[i * size + j] += C(u) * C(v) // / 4.0 // Wrong? Why extra div by 4?
+                                        * std::cos(double(2.0 * i + 1.0) * u * factor)
+                                        * std::cos(double(2.0 * j + 1.0) * v * factor)
+                                        * vec[u * size + v];
+                }
+            }
+        }
+    }
+
+    std::copy_n(temp, len, vec);
+    util::deallocArray(temp);
+}
+#endif

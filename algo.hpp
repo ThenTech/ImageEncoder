@@ -3,15 +3,14 @@
 
 #include <vector>
 
-namespace algo {
-    // From: https://www.nayuki.io/page/fast-discrete-cosine-transform-algorithms
+// Use one implementation of:
+//#define ALGO_USE_DCT_LEE
+//#define ALGO_USE_DCT_NAIVE
+#define ALGO_USE_DCT_NAIVE_PY
 
-    void transformDCT(std::vector<double> &vec);
+namespace algo {
     void transformDCT(double vec[], size_t len);
-    void naiveTransformDCT(double vec[], size_t len);
-    void transformDCTinverse(std::vector<double> &vec);
     void transformDCTinverse(double vec[], std::size_t len);
-    void naiveTransformDCTinverse(double vec[], size_t len);
 }
 
 #endif // ALGO_HPP

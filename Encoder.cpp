@@ -20,33 +20,64 @@ dc::Encoder::~Encoder(void) {
 bool dc::Encoder::process(void) {
     bool success = true;
 
-    util::Logger::Write("[Encoder] Processing image...");
+    util::Logger::WriteLn("[Encoder] Processing image...");
 
     // Pre-process image
     success = ImageProcessor::process();
 
     // TODO Write encoder
-    util::Logger::Write("TODO Do work");
+    util::Logger::WriteLn("Loaded image:");
     size_t x, y;
 
     for (y = 0; y < this->height; y++) {
         for (x = 0; x < this->width; x++) {
-            putchar(this->reader->get(8) ? ' ' : 219);
+            util::Logger::Write(this->reader->get(8) ? util::Logger::EMPTY : util::Logger::FILL, false);
         }
-        putchar('\n');
-    }   putchar('\n'); putchar('\n'); putchar('\n');
+        util::Logger::WriteLn("", false);
+    }
+
+    util::Logger::WriteLn("", false);
+    util::Logger::WriteLn("", false);
 
 
-    for (const Block<>* b : *this->blocks) {
+    util::Logger::WriteLn("Blocks:");
+    for (Block<>* b : *this->blocks) {
         b->print();
-        putchar('\n');
+
+        // Before
+        util::Logger::WriteLn("Expanded:");
+        b->logExpanded();
+        util::Logger::WriteLn("", false);
+
+        // Forward DCT
+        util::Logger::WriteLn("Forward DCT:");
+        b->forwardDCT();
+        b->logExpanded();
+        util::Logger::WriteLn("", false);
+
+        // Quantize
+        util::Logger::WriteLn("Quantized:");
+        b->quantDiv(this->quant_m.getData());
+        b->logExpanded();
+        util::Logger::WriteLn("", false);
+
+        // Un-quantize
+        util::Logger::WriteLn("Un-quantize:");
+        b->quantMult(this->quant_m.getData());
+        b->logExpanded();
+        util::Logger::WriteLn("", false);
+
+        // Inverse DCT  => should be the same as the first??
+        util::Logger::WriteLn("Inverse DCT:");
+        b->inverseDCT();
+        b->logExpanded();
+        util::Logger::WriteLn("", false);
     }
 
     // TODO Discrete Cosine Transform on every block
-    for (Block<>* b : *this->blocks) {
-        b->forwardDCT();
-        putchar('\n');
-    }
+//    for (Block<>* b : *this->blocks) {
+//        b->forwardDCT();
+//    }
 
     // TODO Quantize every block with this->quant_m
     // TODO Zig-zag store results of each block in a list

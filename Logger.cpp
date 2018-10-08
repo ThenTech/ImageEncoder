@@ -5,10 +5,13 @@
 #include <iostream>
 #include <iomanip>
 #include <ctime>
+#include "utils.hpp"
 
 
 util::Logger util::Logger::instance;
-
+// Using "█" is logged, but only std::string_format("%c", 219) is printed to console...
+const std::string util::Logger::FILL  = std::string_format("%c", 219); // std::string_format("%c", 219)  char 219  █
+const std::string util::Logger::EMPTY = " ";
 
 void util::Logger::Create(const std::string &fileName) {
     if (fileName.length() > 0) {
@@ -31,7 +34,7 @@ void util::Logger::Create(const std::string &fileName) {
                 #define DEC_TXT
             #endif
 
-            util::Logger::Write("JPEG " ENC_TXT DEC_TXT " by " AUTHOR " v" VERSION "\n", false);
+            util::Logger::WriteLn("JPEG " ENC_TXT DEC_TXT " by " AUTHOR " v" VERSION "\n", false);
         } catch (std::exception const& e) {
             std::cerr << "[Logger] " << e.what() << std::endl;
             util::Logger::instance.enabled = false;
@@ -53,19 +56,23 @@ void util::Logger::Destroy() {
 void util::Logger::Write(const std::string &text, bool timestamp) {
     if (util::Logger::instance.enabled) {
         try {
-            std::cout << text << std::endl;
+            std::cout << text;
 
             if (timestamp) {
                 auto t  = std::time(nullptr);
                 auto tm = std::localtime(&t);
-                util::Logger::instance.log_file << std::put_time(tm, "%Y-%m-%d %H:%M:%S")
-                                                << " ";
+                util::Logger::instance.log_file << "[" << std::put_time(tm, "%Y-%m-%d %H:%M:%S")
+                                                << "] ";
             }
 
-            util::Logger::instance.log_file << text << std::endl;
+            util::Logger::instance.log_file << text;
         } catch (std::exception const& e) {
             std::cerr << "[Logger] " << e.what() << std::endl;
             util::Logger::Destroy();
         }
     }
+}
+
+void util::Logger::WriteLn(const std::string &text, bool timestamp) {
+    util::Logger::Write(text + "\n", timestamp);
 }

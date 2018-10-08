@@ -37,9 +37,9 @@ int main(int argc, char *argv[]) {
 
     util::Logger::Create(c.getValue(dc::Setting::logfile));
 
-    util::Logger::Write("Input settings:", false);
-    util::Logger::Write("-------------------------", false);
-    util::Logger::Write(c.toString(), false);
+    util::Logger::WriteLn("Input settings:", false);
+    util::Logger::WriteLn("-------------------------", false);
+    util::Logger::WriteLn(c.toString(), false);
 
     const std::string encfile = c.getValue(dc::Setting::encfile),
                       decfile = c.getValue(dc::Setting::decfile);
@@ -52,9 +52,9 @@ int main(int argc, char *argv[]) {
             return 4;
         }
 
-        util::Logger::Write("Quantization matrix:", false);
-        util::Logger::Write("-------------------------", false);
-        util::Logger::Write(m.toString(), false);
+        util::Logger::WriteLn("Quantization matrix:", false);
+        util::Logger::WriteLn("-------------------------", false);
+        util::Logger::WriteLn(m.toString(), false);
 
         const std::string rawfile = c.getValue(dc::Setting::rawfile);
         uint16_t width, height, rle;
@@ -64,7 +64,7 @@ int main(int argc, char *argv[]) {
             height = util::lexical_cast<uint16_t>(c.getValue(dc::Setting::height).c_str());
             rle    = util::lexical_cast<uint16_t>(c.getValue(dc::Setting::rle).c_str());
         } catch (Exceptions::CastingException const& e) {
-            util::Logger::Write(e.getMessage());
+            util::Logger::WriteLn(e.getMessage());
             return 5;
         }
 
@@ -73,7 +73,7 @@ int main(int argc, char *argv[]) {
         if ((success = enc.process())) {
             enc.saveResult();
         } else {
-            util::Logger::Write("Error processing raw image for encoding! See log for details.");
+            util::Logger::WriteLn("Error processing raw image for encoding! See log for details.");
         }
     #endif
 

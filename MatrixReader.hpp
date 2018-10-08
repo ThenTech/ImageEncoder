@@ -12,10 +12,11 @@ namespace dc {
     template<size_t size = dc::BlockSize>
     class MatrixReader {
         private:
-            uint32_t matrix[size][size];
+            uint32_t matrix  [size * size];
+            double   expanded[size * size];
             std::string m_errStr;
 
-            MatrixReader(uint32_t **matrix);
+            MatrixReader(uint32_t *matrix);
 
         public:
             MatrixReader(void);
@@ -27,6 +28,7 @@ namespace dc {
             const std::string toString(void) const;
 
             uint8_t getMaxBitLength(void) const;
+            const double* getData(void) const;
 
             static constexpr size_t SIZE_LEN_BITS = 5;
     };

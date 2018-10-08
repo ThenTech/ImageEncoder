@@ -18,6 +18,10 @@ namespace util {
             static void Create(const std::string &fileName);
             static void Destroy();
             static void Write(const std::string &text, bool timestamp=true);
+            static void WriteLn(const std::string &text, bool timestamp=true);
+
+            static const std::string FILL;
+            static const std::string EMPTY;
     };
 }
 

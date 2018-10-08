@@ -14,8 +14,8 @@
 #endif
 
 // Create target code for decoding
-#ifndef DECODER
-#define DECODER
-#endif
+//#ifndef DECODER
+//#define DECODER
+//#endif
 
 #endif // MAIN_HPP
