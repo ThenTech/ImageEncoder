@@ -32,7 +32,7 @@ dc::ImageProcessor::ImageProcessor(const std::string &source_file,
       dest_file(dest_file),
       blocks(util::allocVar<std::vector<Block<>*>>())
 {
-    this->pixeldata = util::allocArray<double>(this->width * this->height);
+    // Empty
 }
 
 dc::ImageProcessor::ImageProcessor(const std::string &source_file, const std::string &dest_file)
@@ -49,8 +49,6 @@ dc::ImageProcessor::ImageProcessor(const std::string &source_file, const std::st
     this->width   = uint16_t(this->reader->get(dc::ImageProcessor::DIM_BITS));
     this->height  = uint16_t(this->reader->get(dc::ImageProcessor::DIM_BITS));
 
-    this->pixeldata = util::allocArray<double>(this->width * this->height);
-
     // Add padding to next whole byte
     this->reader->set_position(this->reader->get_position() +
                                (8 - (this->reader->get_position() % 8u)));
@@ -58,12 +56,11 @@ dc::ImageProcessor::ImageProcessor(const std::string &source_file, const std::st
 
 dc::ImageProcessor::~ImageProcessor(void) {
     util::deallocVector(this->blocks);
-    util::deallocArray(this->pixeldata);
 }
 
 bool dc::ImageProcessor::process(void) {
     util::Logger::WriteLn("[ImageProcessor] Creating blocks...");
-    double *block_starts[dc::BlockSize] = { nullptr };
+    uint8_t *block_starts[dc::BlockSize] = { nullptr };
     size_t  b_y = 0, b_x = 0, y;
 
     constexpr size_t block_size = dc::BlockSize * dc::BlockSize;
@@ -75,13 +72,12 @@ bool dc::ImageProcessor::process(void) {
 
     // Copy uint8_t pixels with position offset to doubles
     uint8_t *buffer_start = this->reader->get_buffer() + (this->reader->get_position() / 8u);
-    std::copy_n(buffer_start, this->width * this->height, this->pixeldata);
 
     // Get only pointers to start of each block row and save to Block in this->blocks
     for (b_y = 0; b_y < blocky; b_y++) {
         for (b_x = 0; b_x < blockx; b_x++) {
             for (y = 0; y < dc::BlockSize; y++) {
-                block_starts[y] = (this->pixeldata +                // Buffer start
+                block_starts[y] = (buffer_start +                   // Buffer start
                                    (  (b_y * block_size * blockx)   // Block row start
                                     + (b_x * dc::BlockSize)         // Block column start
                                     + (y * this->width)             // Row within block
@@ -90,6 +86,9 @@ bool dc::ImageProcessor::process(void) {
             this->blocks->push_back(util::allocVar<dc::Block<>>(block_starts));
         }
     }
+
+    util::Logger::WriteLn(std::string_format("[ImageProcessor] Caching zig-zag pattern for blocksize %d...", dc::BlockSize));
+    Block<dc::BlockSize>::CreateZigZagLUT();
 
     return true;
 }

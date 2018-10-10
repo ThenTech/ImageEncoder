@@ -15,7 +15,7 @@ dc::Decoder::Decoder(const std::string &source_file, const std::string &dest_fil
     const size_t hdrlen = this->reader->get_position() / 8u;
     const size_t datlen = this->reader->get_size() - hdrlen;
 
-    assert(datlen == (this->width * this->height));
+    assert(datlen == size_t(this->width * this->height));
 
     util::Logger::WriteLn("[Decoder] Loaded image with "
                         + std::to_string(hdrlen) + " bytes header and "

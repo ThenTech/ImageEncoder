@@ -243,7 +243,7 @@ namespace util {
      *		Throws FileReadException if the file could not be read properly.
      */
     [[maybe_unused]] static inline std::vector<uint8_t>* readBinaryFile(const std::string &filename) {
-        std::ifstream file(filename, std::ifstream::binary);
+        std::ifstream file(filename, std::ifstream::binary | std::ifstream::ate);
 
         if (!file.good()) {
             file.close();
@@ -253,7 +253,7 @@ namespace util {
         std::vector<uint8_t> *v_buff = new std::vector<uint8_t>();
 
         try {
-            file.seekg(0, std::ios::end);
+//            file.seekg(0, std::ios::end);
             v_buff->reserve(size_t(file.tellg()));
             file.seekg(0, std::ios::beg);
             v_buff->assign((std::istreambuf_iterator<char>(file)),

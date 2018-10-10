@@ -36,8 +36,6 @@ namespace dc {
 
             const std::string     &dest_file;
             std::vector<Block<>*> *blocks;
-
-            double *pixeldata;
         public:
             ImageProcessor(const std::string &source_file, const std::string &dest_file,
                            const uint16_t &width, const uint16_t &height,

@@ -2,7 +2,7 @@
 #define BLOCK_HPP
 
 #include "BitStream.hpp"
-#include <array>
+#include <vector>
 
 namespace dc {
     static constexpr size_t BlockSize = 4u;
@@ -10,10 +10,10 @@ namespace dc {
     template<size_t size = dc::BlockSize>
     class Block {
         private:
-            double *matrix[size];
-            double  expanded[size * size];
+            uint8_t *matrix[size];
+            double   expanded[size * size];
         public:
-            Block(double *row_offset_list[]);
+            Block(uint8_t *row_offset_list[]);
             ~Block(void);
 
             void forwardDCT(void);
@@ -23,8 +23,15 @@ namespace dc {
             void quantDiv(const double m[]);
 
             void expand(void) const;
+
+            void processDCTDivQ(const double m[]);
+            void processIDCTMulQ(const double m[]);
+
             void print(void) const;
+            void printZigzag(void) const;
             void logExpanded(void) const;
+
+            static void CreateZigZagLUT(void);
     };
 
     extern template class dc::Block<dc::BlockSize>;

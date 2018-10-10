@@ -1,5 +1,6 @@
 #include "Encoder.hpp"
 #include "Logger.hpp"
+#include "utils.hpp"
 
 #include <cassert>
 
@@ -39,51 +40,41 @@ bool dc::Encoder::process(void) {
     util::Logger::WriteLn("", false);
     util::Logger::WriteLn("", false);
 
-
     util::Logger::WriteLn("Blocks:");
+    size_t blockid = 0u;
+
     for (Block<>* b : *this->blocks) {
+        util::Logger::WriteLn(std::string_format("Block % 3d:", blockid++));
         b->print();
-
-        // Before
-        util::Logger::WriteLn("Expanded:");
-        b->logExpanded();
         util::Logger::WriteLn("", false);
 
-        // Forward DCT
-        util::Logger::WriteLn("Forward DCT:");
-        b->forwardDCT();
-        b->logExpanded();
+        util::Logger::WriteLn("After DCT and quantization:");
+        b->processDCTDivQ(this->quant_m.getData());
+        b->print();
         util::Logger::WriteLn("", false);
 
-        // Quantize
-        util::Logger::WriteLn("Quantized:");
-        b->quantDiv(this->quant_m.getData());
-        b->logExpanded();
-        util::Logger::WriteLn("", false);
+//        util::Logger::WriteLn("Reverse DCT and quantization:");
+//        b->processIDCTMulQ(this->quant_m.getData());
+//        b->print();
+//        util::Logger::WriteLn("", false);
 
-        // Un-quantize
-        util::Logger::WriteLn("Un-quantize:");
-        b->quantMult(this->quant_m.getData());
-        b->logExpanded();
-        util::Logger::WriteLn("", false);
-
-        // Inverse DCT  => should be the same as the first??
-        util::Logger::WriteLn("Inverse DCT:");
-        b->inverseDCT();
-        b->logExpanded();
+        util::Logger::WriteLn("Zigzag:");
+        b->printZigzag();
         util::Logger::WriteLn("", false);
     }
 
     // TODO Discrete Cosine Transform on every block
-//    for (Block<>* b : *this->blocks) {
-//        b->forwardDCT();
-//    }
+    // Ok? TODO check more performant algo
 
     // TODO Quantize every block with this->quant_m
+    // Ok
+
     // TODO Zig-zag store results of each block in a list
-    // TODO Perform run-length encoding to list if this->use_rle -- true
+    // TODO Perform run-length encoding to list if this->use_rle == true
+
     // TODO Write output to file with decoding info like (this->quant_m, this->use_rle, width, height)
     //      with minimum amount of bits
+    // Ok
 
 
     return success;
