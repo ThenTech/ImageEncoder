@@ -1,4 +1,3 @@
-
 # ImageEncoder
 #### William Thenaers - v0.0.0.5
 
@@ -19,7 +18,8 @@
 
 ## Info
 - Linux builds (through Win10 bash) and Windows builds are provided in ./bin
-- Everything was implemented according to the assignment
+- A QtCreator .qbs project file is included for debugging, the makefile will always build for release.
+- Everything was implemented according to the assignment.
 - The only extra thing is an offset for each pixel before the DCT step (and after the iDCT),
 here the value of 128 is subtracted from the pixels (and added during decoding) to make the DCT
 components smaller and easier to fit in less space.
@@ -40,6 +40,11 @@ components smaller and easier to fit in less space.
 For the example quant matrix in the assignment, the header is 20.5 bytes of data.
 
 - The encoder/decoder will give a compression percentage after writing the resulting file. (`< 100.0`: result is smaller, `> 100.0`: result is bigger )
+- The Block size is provided as a Template argument and can be changed in Block.hpp.
+Everything should work as expected, only a 8x8 quant matrix is needed to continue.
+However, resulting images do not seem as good in comparison with a 4x4 block size.
+- A single example is provided (the image from the iPyhton notebooks) for convenience.
+Other testing images used during development can be added on request.
 
 
 ## Example
