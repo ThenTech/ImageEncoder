@@ -179,8 +179,13 @@ void dc::Block<size>::createRLESequence(void) {
  */
 template<size_t size>
 size_t dc::Block<size>::streamSize(void) const {
-    return 4u                   // 4 bits for bit length
-         + (size * size * 8u);  // Upper estimate for needed bits
+    if (this->rle_Data == nullptr) {
+        return 4u                    // 4 bits for bit length
+             + (size * size * 16u);  // Upper estimate for needed bits
+    } else {
+        // Exact prediction if RLE sequence is known
+        return 4u + (size * size * this->rle_Data->front()->data_bits);
+    }
 }
 
 /**
