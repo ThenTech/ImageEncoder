@@ -11,12 +11,14 @@
 #include <sstream>
 #include <memory>
 
-#ifndef _MSC_VER
+#ifdef _MSC_VER
+    #include <intrin.h>
+#else
     #include <cxxabi.h>
-#endif
 
-#if __cplusplus < 201703L
-#error A C++17 compiler is required!
+    #if __cplusplus < 201703L
+    #error A C++17 compiler is required!
+    #endif
 #endif
 
 #include "Exceptions.hpp"
@@ -169,8 +171,12 @@ namespace util {
      * \retval bitIndex
      *      Index of least significat bit at one
      */
-    [[maybe_unused]] static inline uint8_t ffs(uint32_t value ) {;
-        return uint8_t(32 - __builtin_clz(value));
+    [[maybe_unused]] static inline uint8_t ffs(uint32_t value ) {
+        #ifdef _MSC_VER
+            return uint8_t(32 - __lzcnt(value));
+        #else
+            return uint8_t(32 - __builtin_clz(value));
+        #endif
     }
 
     /**

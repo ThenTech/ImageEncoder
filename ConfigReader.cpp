@@ -62,7 +62,12 @@ dc::ConfigReader::~ConfigReader() {}
 bool dc::ConfigReader::read(const std::string &fileName) {
     this->clear();
 
-    FILE *pFile = std::fopen(fileName.c_str(), "rt");
+    #ifdef _MSC_VER
+        FILE *pFile;
+        fopen_s(&pFile, fileName.c_str(), "rt");
+    #else
+        FILE *pFile = std::fopen(fileName.c_str(), "rt");
+    #endif
 
     if (pFile == nullptr) {
         this->m_errStr = std::string("Can't open file");

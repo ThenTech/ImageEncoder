@@ -82,7 +82,7 @@ void dc::Block<size>::processDCTDivQ(const double m[]) {
     #ifdef SUBTRACT_128
         std::transform(this->expanded, this->expanded + size * size,
                        this->expanded,
-                       bind2nd(std::plus<double>(), -128));
+                       std::bind(std::plus<double>(), std::placeholders::_1, -128));
     #endif
 
     algo::transformDCT(this->expanded, size * size);
@@ -114,7 +114,7 @@ void dc::Block<size>::processIDCTMulQ(const double m[]) {
     #ifdef SUBTRACT_128
         std::transform(this->expanded, this->expanded + size * size,
                        this->expanded,
-                       std::bind2nd(std::plus<double>(), 128));
+                       std::bind(std::plus<double>(), std::placeholders::_1, 128));
     #endif
 }
 

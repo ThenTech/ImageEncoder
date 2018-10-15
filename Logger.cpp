@@ -90,7 +90,15 @@ void util::Logger::Write(const std::string &text, bool timestamp) {
 
             if (timestamp) {
                 auto t  = std::time(nullptr);
-                auto tm = std::localtime(&t);
+
+                #ifdef _MSC_VER
+                    tm tm_l;
+                    localtime_s(&tm_l, &t);
+                    tm *tm = &tm_l;
+                #else
+                    auto tm = std::localtime(&t);
+                #endif
+
                 util::Logger::instance.log_file << "[" << std::put_time(tm, "%Y-%m-%d %H:%M:%S")
                                                 << "] ";
             }

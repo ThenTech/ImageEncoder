@@ -6,7 +6,13 @@
 
 #include "utils.hpp"
 
-#include <cmath>
+#ifdef _MSC_VER
+    // cmath does not seem to exist with MSVC compiler...
+    #include <math.h>
+#else
+    #include <cmath>
+#endif
+
 #include <cassert>
 
 ////////////////////////////////////////////////////
