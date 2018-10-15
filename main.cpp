@@ -21,7 +21,7 @@ int main(int argc, char *argv[]) {
     }
 
     dc::ConfigReader c;
-    
+
     if (!c.read(argv[1])) {
         std::cerr << "Error reading file '" << argv[1] << "'!" << std::endl;
         std::cerr << c.getErrorDescription() << std::endl;
@@ -35,7 +35,11 @@ int main(int argc, char *argv[]) {
         return 3;
     }
 
-    util::Logger::Create(c.getValue(dc::Setting::logfile));
+    #ifdef LOG_OFF
+        util::Logger::Create("");
+    #else
+        util::Logger::Create(c.getValue(dc::Setting::logfile));
+    #endif
 
     util::Logger::WriteLn("Input settings:", false);
     util::Logger::WriteLn("-------------------------", false);
@@ -72,6 +76,7 @@ int main(int argc, char *argv[]) {
 
         if ((success = enc.process())) {
             enc.saveResult();
+            util::Logger::WriteLn("", false);
         } else {
             util::Logger::WriteLn("Error processing raw image for encoding! See log for details.");
         }

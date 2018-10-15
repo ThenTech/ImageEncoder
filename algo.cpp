@@ -9,12 +9,92 @@
 #include <cmath>
 #include <cassert>
 
+////////////////////////////////////////////////////
+///   Create zigzag lut
+////////////////////////////////////////////////////
+
+/**
+ *  @brief  Sort Positions on group or column to create
+ *          zig-zag pattern.
+ *  @param  i
+ *      First Position to compare.
+ *  @param  j
+ *      Second Position to compare.
+ *  @return
+ *      Returns true if <i> should be placed before <y> else false.
+ */
+bool bubble_positions(const algo::Position_t& i, const algo::Position_t& j) {
+    return (i.group == j.group)
+         ? (i.col < j.col)
+         : (i.group < j.group);
+}
+
+/**
+ * @brief   Creates a std::vector with Position_t entries in BlockZigZagLUT
+ *          to be used as a LUT for the zig-zag sequence as given below.
+ *
+ *          Works for any (size*size) block.
+ *
+ *          Must be called by Encoder/Decoder before creating blocks.
+ *
+ *  Example matrix:
+ *   0  1  2  3
+ *   4  5  6  7
+ *   8  9 10 11
+ *  12 13 14 15
+ *
+ *  Zigzag sequence:
+ *  0 1 4 8 5 2 3 6 9 12 13 10 7 11 14 15
+ *
+ *  Printed pattern:
+ *   0
+ *   1  4
+ *   8  5  2
+ *   3  6  9 12
+ *  13 10  7
+ *  11 14
+ *  15
+ *
+ *  Algorithm adapted from:
+ *      https://gist.github.com/gokercebeci/10556381
+ */
+void algo::createZigzagLUT(std::vector<algo::Position_t> &vec, const size_t size) {
+    const size_t len = size * size;
+    vec.clear();
+    vec.resize(len);
+
+    for(uint8_t i = 0; i < len; i++){
+        const uint8_t x = i % size;
+        const uint8_t y = i / size;
+
+        vec[i] = algo::Position_t {
+            uint8_t(x + y),
+            ((int8_t(x - y) & 1) ? y : x),  // not divisible by 2 => y else x
+            x,
+            y
+        };
+    }
+
+    // Sort by groups or columns
+    std::sort(vec.begin(), vec.end(), bubble_positions);
+}
+
+
+////////////////////////////////////////////////////
+///   RLE
+////////////////////////////////////////////////////
+
+
+////////////////////////////////////////////////////
+///   DCT
+////////////////////////////////////////////////////
+
 #if   defined(ALGO_USE_DCT_LEE)
 // From: https://www.nayuki.io/page/fast-discrete-cosine-transform-algorithms
 
 // DCT type II, unscaled. Algorithm by Byeong Gi Lee, 1984.
 // See:  http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.118.3056&rep=rep1&type=pdf#page=34
-static void forwardTransformDCT(double vec[], double temp[], size_t len) {
+static void forwardTransformDCT(double vec[], double temp[], const size_t len) {
     if (len == 1)
         return;
 
@@ -42,11 +122,11 @@ static void forwardTransformDCT(double vec[], double temp[], size_t len) {
 
 // DCT type III, unscaled. Algorithm by Byeong Gi Lee, 1984.
 // See: https://www.nayuki.io/res/fast-discrete-cosine-transform-algorithms/lee-new-algo-discrete-cosine-transform.pdf
-static void inverseTransformDCT(double vec[], double temp[], size_t len) {
+static void inverseTransformDCT(double vec[], double temp[], const size_t len) {
     if (len == 1)
         return;
 
-    size_t halfLen = len / 2;
+    const size_t halfLen = len / 2;
     temp[0] = vec[0];
     temp[halfLen] = vec[1];
 
@@ -66,13 +146,13 @@ static void inverseTransformDCT(double vec[], double temp[], size_t len) {
     }
 }
 
-void algo::transformDCT(double vec[], size_t len) {
+void algo::transformDCT(double vec[], const size_t len) {
     assert(len > 0 && (len & (len - 1)) == 0); // Length is power of 2
     std::vector<double> temp(len);
     forwardTransformDCT(vec, temp.data(), len);
 }
 
-void algo::transformDCTinverse(double vec[], size_t len) {
+void algo::transformDCTinverse(double vec[], const size_t len) {
     assert(len > 0 && (len & (len - 1)) == 0); // Length is power of 2
     vec[0] /= 2.0;
     std::vector<double> temp(len);
@@ -84,7 +164,7 @@ void algo::transformDCTinverse(double vec[], size_t len) {
  **********************************************/
 // From: https://www.nayuki.io/page/fast-discrete-cosine-transform-algorithms
 
-void algo::transformDCT(double vec[], size_t len) {
+void algo::transformDCT(double vec[], const size_t len) {
     std::vector<double> temp(len);
     const double factor = M_PI / len;
 
@@ -101,7 +181,7 @@ void algo::transformDCT(double vec[], size_t len) {
     std::copy(temp.begin(), temp.end(), vec);
 }
 
-void algo::transformDCTinverse(double vec[], size_t len) {
+void algo::transformDCTinverse(double vec[], const size_t len) {
     std::vector<double> temp(len);
     const double factor = M_PI / len;
 
@@ -121,12 +201,29 @@ void algo::transformDCTinverse(double vec[], size_t len) {
 /**********************************************
  *  Naive approach from iPython notebook.
  **********************************************/
-double C(size_t i) {
+
+/**
+ *  @brief  Calculate co-facrtor for each element in DCT matrix.
+ *  @param  i
+ *      The row or column to give the factor for.
+ *  @return
+ */
+static inline double C(const size_t i) {
 //    return i == 0 ? M_SQRT2 / 2.0 : 1.0;  // Wrong?
     return i == 0 ? 0.5 : M_SQRT1_2; // voor size=4 of len=16
 }
 
-void algo::transformDCT(double vec[], size_t len) {
+/**
+ *  @brief  Calculate the Discrete Cosine Transformation for the given flattened matrix of size len.
+ *          Creates a temporary matrix and copies the results to vec after completion.
+ *
+ *  @param  vec
+ *      The matrix to calculate the DCT for, given as a flattened array of total length len,
+ *      with std::sqrt(len) colums and rows.
+ *  @param  len
+ *      The total length of the given array and the product of the amount of rows and columns.
+ */
+void algo::transformDCT(double vec[], const size_t len) {
     double *temp        = util::allocArray<double>(len);
     const size_t size   = size_t(std::sqrt(len));
     const double factor = M_PI_2 / double(size);
@@ -150,7 +247,17 @@ void algo::transformDCT(double vec[], size_t len) {
     util::deallocArray(temp);
 }
 
-void algo::transformDCTinverse(double vec[], size_t len) {
+/**
+ *  @brief  Calculate the inverse Discrete Cosine Transformation for the given flattened matrix of size len.
+ *          Creates a temporary matrix and copies the results to vec after completion.
+ *
+ *  @param  vec
+ *      The matrix to calculate the iDCT for, given as a flattened array of total length len,
+ *      with std::sqrt(len) colums and rows.
+ *  @param  len
+ *      The total length of the given array and the product of the amount of rows and columns.
+ */
+void algo::transformDCTinverse(double vec[], const size_t len) {
     double *temp        = util::allocArray<double>(len);
     const size_t size   = size_t(std::sqrt(len));
     const double factor = M_PI_2 / double(size);

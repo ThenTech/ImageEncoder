@@ -4,6 +4,11 @@
 #include <fstream>
 
 namespace util {
+    /**
+     *  @brief  A class with static methods for logging to std::cout and a log file.
+     *          Create the Loging instance with Logger::Create(),
+     *          and destroy it by calling Logger::Destroy()
+     */
     class Logger {
         private:
             bool enabled;

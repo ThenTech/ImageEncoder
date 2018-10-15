@@ -1,8 +1,18 @@
+#include "ImageBase.hpp"
 #include "utils.hpp"
 #include "Logger.hpp"
-#include "ImageBase.hpp"
 #include "Block.hpp"
 
+/**
+ *  @brief  Default ctor
+ *
+ *  @param  source_file
+ *      Path to a raw image file.
+ *  @param  width
+ *      The width in pixels for the image.
+ *  @param  height
+ *      The height in pixels for the image.
+ */
 dc::ImageBase::ImageBase(const std::string &source_file, const uint16_t &width, const uint16_t &height)
     : width(width), height(height)
 {
@@ -16,6 +26,9 @@ dc::ImageBase::ImageBase(const std::string &source_file, const uint16_t &width, 
     this->reader = util::allocVar<util::BitStreamReader>(this->raw->data(), this->raw->size());
 }
 
+/**
+ *  @brief  Default dtor
+ */
 dc::ImageBase::~ImageBase(void) {
     util::deallocVar(this->raw);
     util::deallocVar(this->reader);
@@ -23,6 +36,23 @@ dc::ImageBase::~ImageBase(void) {
 
 ////////////////////////////////////////////////////////////////////////////////////
 
+/**
+ *  @brief  Default ctor for encoder.
+ *
+ *  @param  source_file
+ *      Path to a raw image file.
+ *  @param  dest_file
+ *      Path to the destination file (path needs to exist, file will be overwritten).
+ *  @param  width
+ *      The width in pixels for the image.
+ *  @param  height
+ *      The height in pixels for the image.
+ *  @param  use_rle
+ *      Whether to use Run-Length Encoding.
+ *      Currently enabling this wil drop trailing zeroes in an encoded block.
+ *  @param  quant_m
+ *      The quantization matrix to use.
+ */
 dc::ImageProcessor::ImageProcessor(const std::string &source_file,
                                    const std::string &dest_file,
                                    const uint16_t &width, const uint16_t &height,
@@ -35,9 +65,17 @@ dc::ImageProcessor::ImageProcessor(const std::string &source_file,
     // Empty
 }
 
+/**
+ *  @brief  Default ctor for decoder, settings need to be determined from the reader stream.
+ *
+ *  @param  source_file
+ *      Path to a raw image file.
+ *  @param  dest_file
+ *      Path to the destination file (path needs to exist, file will be overwritten).
+ */
 dc::ImageProcessor::ImageProcessor(const std::string &source_file, const std::string &dest_file)
-    : ImageBase(source_file, 0u, 0u),
-      quant_m(dc::MatrixReader<>::fromBitstream(*this->reader)),
+    : ImageBase(source_file, 0u, 0u),                            ///< Create stream
+      quant_m(dc::MatrixReader<>::fromBitstream(*this->reader)), ///< Read matrix from stream
       dest_file(dest_file),
       blocks(util::allocVar<std::vector<Block<>*>>())
 {
@@ -45,119 +83,88 @@ dc::ImageProcessor::ImageProcessor(const std::string &source_file, const std::st
 
     // Matrix was already read here
 
+    // Read other settings in same order as they were presumably written to the encoded stream
     this->use_rle = this->reader->get(dc::ImageProcessor::RLE_BITS);
     this->width   = uint16_t(this->reader->get(dc::ImageProcessor::DIM_BITS));
     this->height  = uint16_t(this->reader->get(dc::ImageProcessor::DIM_BITS));
-
-    // Add padding to next whole byte
-    this->reader->set_position(this->reader->get_position() +
-                               (8 - (this->reader->get_position() % 8u)));
 }
 
+/**
+ *  @brief  Default dtor
+ */
 dc::ImageProcessor::~ImageProcessor(void) {
     util::deallocVector(this->blocks);
+    util::deallocVar(this->writer);
 }
 
-bool dc::ImageProcessor::process(void) {
+/**
+ *  @brief  Start processing by creating blocks for the given stream.
+ *
+ *  @param  source_block_buffer
+ *      The source strean te create blocks from.
+ *      Usually the reader stream when encoding, and the writer stream when decoding.
+ *  @return Returns true on success.
+ */
+bool dc::ImageProcessor::process(uint8_t * const source_block_buffer) {
     util::Logger::WriteLn("[ImageProcessor] Creating blocks...");
     uint8_t *block_starts[dc::BlockSize] = { nullptr };
-    size_t  b_y = 0, b_x = 0, y;
 
-    constexpr size_t block_size = dc::BlockSize * dc::BlockSize;
-    const     size_t blockx     = this->width  / dc::BlockSize;
-    const     size_t blocky     = this->height / dc::BlockSize;
+    constexpr size_t block_size = dc::BlockSize * dc::BlockSize;    ///< Total values inside 1 Block
+    const     size_t blockx     = this->width  / dc::BlockSize;     ///< Amount of Blocks on a row
+    const     size_t blocky     = this->height / dc::BlockSize;     ///< Amount of Blocks in a column
 
     // Reserve space for blocks
     this->blocks->reserve(blockx * blocky);
 
-    // Copy uint8_t pixels with position offset to doubles
-    uint8_t *buffer_start = this->reader->get_buffer() + (this->reader->get_position() / 8u);
-
     // Get only pointers to start of each block row and save to Block in this->blocks
-    for (b_y = 0; b_y < blocky; b_y++) {
-        for (b_x = 0; b_x < blockx; b_x++) {
-            for (y = 0; y < dc::BlockSize; y++) {
-                block_starts[y] = (buffer_start +                   // Buffer start
+    for (size_t b_y = 0; b_y < blocky; b_y++) {                     ///< Block y coord
+        for (size_t b_x = 0; b_x < blockx; b_x++) {                 ///< Block x coord
+            for (size_t y = 0; y < dc::BlockSize; y++) {            ///< Row inside block
+                block_starts[y] = (source_block_buffer +            // Buffer start
                                    (  (b_y * block_size * blockx)   // Block row start
                                     + (b_x * dc::BlockSize)         // Block column start
                                     + (y * this->width)             // Row within block
                                     + (0)));                        // Column withing block
             }
+
+            // Create new block with the found row offsets
             this->blocks->push_back(util::allocVar<dc::Block<>>(block_starts));
         }
     }
 
+    // Create zig-zag-pattern LUT
     util::Logger::WriteLn(std::string_format("[ImageProcessor] Caching zig-zag pattern for blocksize %d...", dc::BlockSize));
     Block<dc::BlockSize>::CreateZigZagLUT();
 
     return true;
 }
 
-void dc::ImageProcessor::saveResult(bool with_settings) const {
-    size_t output_length, hdrlen = 0u, padding = 0u;
-
-    if (with_settings) {
-        const uint8_t quant_bit_len = this->quant_m.getMaxBitLength();
-        output_length = dc::ImageProcessor::RLE_BITS       // Bit for RLE setting
-                      + dc::ImageProcessor::DIM_BITS * 2u  // 2 times bits for image dimension
-                      + dc::MatrixReader<>::SIZE_LEN_BITS  // Bits to signify size of quant_;atrix contents
-                      + (quant_bit_len                     // Size of quantmatrix
-                         * dc::BlockSize * dc::BlockSize);
-        padding        = 8 - (output_length % 8u);         // Padding to next whole byte
-        output_length += padding;
-
-        hdrlen = output_length / 8u;
-
-        util::Logger::WriteLn("[ImageProcessor] Settings header length: "
-                            + std::to_string(hdrlen)
-                            + " bytes.");
-
-        output_length += this->reader->get_size() * 8u;    // TODO size of encoded image
-    } else {
-        output_length = (this->reader->get_size() * 8u) - this->reader->get_position();
-    }
-
-    output_length /= 8u;
-
-    util::BitStreamWriter *writer = util::allocVar<util::BitStreamWriter>(output_length);
-
-    if (with_settings) {
-        // Write matrix data first
-        this->quant_m.write(*writer);
-
-        // Write other settings
-        writer->put(dc::ImageProcessor::RLE_BITS, uint32_t(this->use_rle));
-        writer->put(dc::ImageProcessor::DIM_BITS, this->width);
-        writer->put(dc::ImageProcessor::DIM_BITS, this->height);
-        writer->put(padding, 0);
-
-        // Write output buffer
-        std::copy_n(this->reader->get_buffer(),
-                    output_length - hdrlen,
-                    writer->get_buffer() + (writer->get_position() / 8u));
-    } else {
-        // Write output buffer
-        std::copy_n(this->reader->get_buffer() + (this->reader->get_position() / 8u),
-                    output_length,
-                    writer->get_buffer());
-    }
+/**
+ *  @brief  Save the writer stream to this->dest_file,
+ *          and give some compression stats.
+ *
+ *  @param  encoded
+ *          Whether this was called after encoding (true) or decoding (false).
+ */
+void dc::ImageProcessor::saveResult(bool encoded) const {
+    const size_t pad          = (8 - (this->writer->get_position() % 8u)) % 8u; ///< Pad last byte to next full byte
+    const size_t total_length = (this->writer->get_position() + pad) / 8u;      ///< Total final write length
 
     #if 1
         // This will only write whole bytes; if pos % 8 != 0, last byte is skipped
         // Edit: Padding is now added after settings, so only whole bytes are in buffer.
         util::writeBinaryFile(this->dest_file,
-                              writer->get_buffer(),
-                              writer->get_size());
+                              this->writer->get_buffer(),
+                              total_length);
     #else
         // Will take last byte into account
         std::ofstream file(this->dest_file, std::ofstream::binary);
         util::write(file, *this->writer);
     #endif
 
-    util::Logger::WriteLn("[ImageProcessor] Total file length: "
-                        + std::to_string(writer->get_size())
-                        + " bytes (" + std::to_string(float(writer->get_size()) / this->raw->size() * 100.f)
-                        + "% " + (with_settings ? "" : "de") + "compression).");
+    util::Logger::WriteLn(std::string_format("[ImageProcessor] Total file length: %d bytes (%.2f%% %scompression).",
+                                             total_length,
+                                             (float(total_length) / this->raw->size() * 100),
+                                             (encoded ? "" : "de")));
     util::Logger::WriteLn("[ImageProcessor] Saved file at: " + this->dest_file);
-    util::deallocVar(writer);
 }

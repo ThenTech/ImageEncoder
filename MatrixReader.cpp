@@ -7,22 +7,41 @@
 #include "utils.hpp"
 #include "Exceptions.hpp"
 
+/**
+ *  @brief  Private ctor to build a matrix from an existing stream.
+ *  @param  matrix
+ */
 template<size_t size>
 dc::MatrixReader<size>::MatrixReader(uint32_t *matrix) {
     std::copy_n(matrix, size * size, this->matrix);
     std::copy_n(matrix, size * size, this->expanded);
 }
 
+/**
+ *  @brief  Default ctor.
+ */
 template<size_t size>
-dc::MatrixReader<size>::MatrixReader() : matrix{0} {
+dc::MatrixReader<size>::MatrixReader() : matrix{0}, expanded{0.0} {
 
 }
 
+/**
+ *  @brief  Default dtor.
+ */
 template<size_t size>
 dc::MatrixReader<size>::~MatrixReader() {
 
 }
 
+/**
+ *  @brief  Read a matrix from an existing bitstream.
+ *          Used for getting the quantization matrix from an encoded image bitstream.
+ *
+ *  @param  reader
+ *      The BitStreamReader to read from.
+ *  @return
+ *      Returns an initialized MatrixReader instance.
+ */
 template<size_t size>
 dc::MatrixReader<> dc::MatrixReader<size>::fromBitstream(util::BitStreamReader &reader) {
     const uint32_t bit_size = reader.get(dc::MatrixReader<>::SIZE_LEN_BITS);
@@ -37,6 +56,12 @@ dc::MatrixReader<> dc::MatrixReader<size>::fromBitstream(util::BitStreamReader &
     return dc::MatrixReader<>(matrix);
 }
 
+/**
+ *  @brief  Read the matrix contents from a text file located at fileName.
+ *          Every number in the matrix should fit in a uint16_t.
+ *  @param  fileName
+ *  @return
+ */
 template<size_t size>
 bool dc::MatrixReader<size>::read(const std::string &fileName) {
     const std::string *data = nullptr;
@@ -108,6 +133,14 @@ bool dc::MatrixReader<size>::read(const std::string &fileName) {
     return !exception;
 }
 
+/**
+ *  @brief  Write the matrix to the given BitStreamWriter with a minimal amount of bits.
+ *          Use dc::MatrixReader<>::SIZE_LEN_BITS bits to save the bit length and
+ *          write size*size values of this->getMaxBitLength() bits to the stream.
+ *
+ *  @param  writer
+ *      The bitstream to write to.
+ */
 template<size_t size>
 void dc::MatrixReader<size>::write(util::BitStreamWriter &writer) const {
     const uint8_t quant_bit_len = this->getMaxBitLength();
@@ -124,6 +157,9 @@ void dc::MatrixReader<size>::write(util::BitStreamWriter &writer) const {
     }
 }
 
+/**
+ *  @brief  Return a string representation for the matrix.
+ */
 template<size_t size>
 const std::string dc::MatrixReader<size>::toString(void) const {
     size_t row, col;
@@ -139,6 +175,9 @@ const std::string dc::MatrixReader<size>::toString(void) const {
     return oss.str();
 }
 
+/**
+ *  @brief  Get the minimal amount of bits needed to represent every matrix element.
+ */
 template<size_t size>
 uint8_t dc::MatrixReader<size>::getMaxBitLength(void) const {
     uint8_t length = 0u;
@@ -150,6 +189,9 @@ uint8_t dc::MatrixReader<size>::getMaxBitLength(void) const {
     return length;
 }
 
+/**
+ *  @brief  Get the internal double matrix.
+ */
 template<size_t size>
 const double* dc::MatrixReader<size>::getData() const {
     return this->expanded;

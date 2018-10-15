@@ -4,6 +4,10 @@
 #include "ImageBase.hpp"
 
 namespace dc {
+    /**
+     *  @brief  The Decoder class
+     *          Used to decode images that were encoded by the Encoder class.
+     */
     class Decoder : public ImageProcessor {
         private:
 
@@ -12,6 +16,7 @@ namespace dc {
             ~Decoder(void);
 
             bool process(void);
+            void saveResult(void) const;
     };
 }
 

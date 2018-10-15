@@ -9,10 +9,13 @@
 
 
 namespace dc {
+    /**
+     *  A class to read a matrix of size <size>*<size> from a text file.
+     */
     template<size_t size = dc::BlockSize>
     class MatrixReader {
         private:
-            uint32_t matrix  [size * size];
+            uint16_t matrix  [size * size];
             double   expanded[size * size];
             std::string m_errStr;
 

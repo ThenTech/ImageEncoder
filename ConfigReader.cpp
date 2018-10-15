@@ -8,6 +8,13 @@
 
 #define MAXLEN 16384
 
+/**
+ *  @brief  Return a string representation of the given Setting.
+ *  @params s
+ *      The Setting to return a string for.
+ *  @return
+ *      A string representation for s.
+ */
 const std::string dc::SettingToKey(dc::Setting s) {
     static const std::string keys[] = {
         "rawfile"  , "encfile", "decfile", "rle",

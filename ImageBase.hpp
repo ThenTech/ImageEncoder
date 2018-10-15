@@ -11,14 +11,16 @@
 namespace dc {
     /**
      *  @brief  The ImageBase class
+     *          Provides a base with the image dimensions and the raw byte buffer
+     *          read into an std::vector and accessible through a BitStreamReader instance.
      */
     class ImageBase {
         protected:
-            uint16_t width;
-            uint16_t height;
+            uint16_t width;                 ///< The width of the image.
+            uint16_t height;                ///< The height of the image.
 
-            std::vector<uint8_t>  *raw;
-            util::BitStreamReader *reader;
+            std::vector<uint8_t>  *raw;     ///< The raw input stream.
+            util::BitStreamReader *reader;  ///< A BitStreamReader linked to the raw input stream.
         public:
             ImageBase(const std::string &source_file, const uint16_t &width, const uint16_t &height);
             ~ImageBase(void);
@@ -31,11 +33,15 @@ namespace dc {
      */
     class ImageProcessor : protected ImageBase {
         protected:
-            bool use_rle;
-            const MatrixReader<> quant_m;
+            bool use_rle;                   ///< Whether to use Run Length Encoding.
+            const MatrixReader<> quant_m;   ///< A quantization matrix instance.
 
-            const std::string     &dest_file;
-            std::vector<Block<>*> *blocks;
+            const std::string     &dest_file; ///< The path to the destination file.
+            std::vector<Block<>*> *blocks;  ///< A list of every Block for the image.
+            util::BitStreamWriter *writer;  ///< The output stream.
+
+            void saveResult(bool) const;
+            bool process(uint8_t * const);
         public:
             ImageProcessor(const std::string &source_file, const std::string &dest_file,
                            const uint16_t &width, const uint16_t &height,
@@ -43,11 +49,16 @@ namespace dc {
             ImageProcessor(const std::string &source_file, const std::string &dest_file);
             virtual ~ImageProcessor(void);
 
-            virtual bool process(void);
-            virtual void saveResult(bool with_settings=false) const;
+            /**
+             *  @brief  Process the image, needs to be implemented in a child class.
+             *          A child class can call ImageProcessor::process(buffer) to create
+             *          block from the buffer.
+             */
+            virtual bool process(void)=0;
+            virtual void saveResult(void) const {}
 
-            static constexpr size_t RLE_BITS = 1;
-            static constexpr size_t DIM_BITS = 15;
+            static constexpr size_t RLE_BITS = 1;   ///< The amount of bits to use to represent zhether to use RLE or not.
+            static constexpr size_t DIM_BITS = 15;  ///< The amount of bits to use to represent the image dimensions (width or height).
     };
 }
 

@@ -6,6 +6,11 @@
 #include <map>
 
 namespace dc {
+    /**
+     *  @brief  An enum with every type of setting.
+     *          Use Setting::<name> to reauest a setting from a ConfigReader instance
+     *          instead of a raw string.
+     */
     enum class Setting : uint8_t {
         rawfile = 0,
         encfile,

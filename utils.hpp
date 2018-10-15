@@ -135,8 +135,20 @@ namespace std {
         return s;
     }
 
+    /**
+     *  \brief  Format the given args into the format string.
+     *
+     *  \tparam ...Type
+     *      Variable argument list of params to expand in the format string.
+     *  \param  format
+     *      The format string to expand.
+     *  \param  args
+     *      The args tro fill in.
+     *  \return
+     *      Returns the format expanded with the args.
+     */
     template<typename ... Type>
-    std::string string_format(const std::string& format, Type ...args) {
+    [[maybe_unused]] static std::string string_format(const std::string& format, Type ...args) {
         const size_t size = std::snprintf(nullptr, 0, format.c_str(), args...) + 1; // Extra space for '\0'
         unique_ptr<char[]> buf(new char[size]);
 
@@ -162,8 +174,35 @@ namespace util {
     }
 
     /**
-     * @brief   Cast enum type to underlining data type.
-     * @param   e
+     *  \brief  Determine the amount of bits needed to represent the given int16_t.
+     *
+     *  \param  value
+     *      The int16_t value to check.
+     *  \return
+     *      Returns the amount of bits required to represent the value if reshifted to 16 bits.
+     */
+    [[maybe_unused]] static inline uint8_t bits_needed(int16_t value) {
+        uint8_t bits = 1;
+
+        // 1. Mask value with amount of current bits : (value & ((1 << bits) - 1))
+        // 2. Shift left to size of 16 bits          : << (16 - bits)
+        // 3. Cast to int16_t
+        // 4. Shift back to original size
+        // 5. Check if value represented with <bits> bits and re-shifted to 16 bits
+        //    equals the starting value.
+        // 6. Repeat until a minimal amount of bits has been found to represent the int16_t.
+        //    (between 1 and 16)
+
+        while ((int16_t((value & ((1 << bits) - 1)) << (16 - bits)) >> (16 - bits)) != value) {
+            bits++;
+        }
+
+        return bits;
+    }
+
+    /**
+     *  \brief   Cast enum type to underlining data type.
+     *  \param   e
      *      The enum value to cast.
      */
     template <typename E>
@@ -253,7 +292,7 @@ namespace util {
         std::vector<uint8_t> *v_buff = new std::vector<uint8_t>();
 
         try {
-//            file.seekg(0, std::ios::end);
+            // Filepointer is already at end due to ::ate option, so tellg() gives filesize
             v_buff->reserve(size_t(file.tellg()));
             file.seekg(0, std::ios::beg);
             v_buff->assign((std::istreambuf_iterator<char>(file)),
@@ -302,6 +341,8 @@ namespace util {
      *
      *	\tparam	T
      *		The type of object to allocate.
+     *	\param	Type... args
+     *		Variable argument list passed down to ctor of T.
      *	\return
      *		A pointer to the newly allocated object.
      */

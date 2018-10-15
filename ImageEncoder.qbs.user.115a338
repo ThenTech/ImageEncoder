@@ -227,9 +227,9 @@
     <value type="QString" key="ProjectExplorer.ProjectConfiguration.DefaultDisplayName">ImageEncoder</value>
     <value type="QString" key="ProjectExplorer.ProjectConfiguration.DisplayName"></value>
     <value type="QString" key="ProjectExplorer.ProjectConfiguration.Id">Qbs.RunConfiguration:ImageEncoder.</value>
-    <value type="QString" key="Qbs.RunConfiguration.CommandLineArguments">settings.conf</value>
+    <value type="QString" key="Qbs.RunConfiguration.CommandLineArguments">ex0.conf</value>
     <value type="bool" key="Qbs.RunConfiguration.UsingLibraryPaths">true</value>
-    <value type="QString" key="Qbs.RunConfiguration.WorkingDirectory">C:/Users/William/OneDrive/UH/Master/DC/Opdrachten/Opdracht_2/ImageEncoder</value>
+    <value type="QString" key="Qbs.RunConfiguration.WorkingDirectory">C:/Users/William/OneDrive/UH/Master/DC/Opdrachten/Opdracht_2/ImageEncoder/bin</value>
     <value type="QString" key="Qbs.RunConfiguration.WorkingDirectory.default">C:/Users/William/OneDrive/UH/Master/DC/Opdrachten/Opdracht_2/ImageEncoder/Debug/install-root</value>
     <value type="uint" key="RunConfiguration.QmlDebugServerPort">3768</value>
     <value type="bool" key="RunConfiguration.UseCppDebugger">false</value>
