@@ -35,3 +35,4 @@
 /bin/*.png
 /bin/ex*.txt
 /bin/*.enc
+*.qbs.user*
