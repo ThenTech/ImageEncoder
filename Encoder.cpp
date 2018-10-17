@@ -2,6 +2,7 @@
 #include "main.hpp"
 #include "Logger.hpp"
 #include "utils.hpp"
+#include "Huffman.hpp"
 
 #include <cassert>
 
@@ -71,7 +72,7 @@ bool dc::Encoder::process(void) {
                                              float(output_length) / 8.f));
 
     output_length += this->blocks->size() * this->blocks->front()->streamSize();
-    output_length += 8 - (output_length % 8u);         // Padding to next whole byte
+    output_length += (8 - (output_length % 8u)) % 8u;         // Padding to next whole byte
     output_length /= 8u;
 
     this->writer = util::allocVar<util::BitStreamWriter>(output_length);
@@ -121,5 +122,24 @@ bool dc::Encoder::process(void) {
  *  @brief  Save the resulting stream to the destination.
  */
 void dc::Encoder::saveResult(void) const {
+
+    util::Logger::WriteLn("\n", false);
+
+    util::Logger::WriteLn("[Encoder] Huffman:");
+    algo::Huffman<> h;
+
+    this->writer->flush();
+    util::BitStreamReader h_input(this->writer->get_buffer(), this->writer->get_position() / 8u);
+
+    util::BitStreamWriter* h_stream = h.encode(h_input);
+
+    #ifdef LOG_LOCAL
+        h.printDict();
+    #endif
+
+    delete h_stream;
+
+    util::Logger::WriteLn("\n", false);
+
     ImageProcessor::saveResult(true);
 }

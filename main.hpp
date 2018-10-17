@@ -4,7 +4,7 @@
 #define AUTHOR  "William Thenaers"
 #define VERSION "0.0.0.5"
 
-#if 0   // Disable for proper building with makefile
+#if 1   // Disable for proper building with makefile
 
 /*
  *  Targets will be set through makefile,
@@ -23,6 +23,6 @@
 #endif // 1
 
 //#define LOG_OFF       ///< Force logging off
-//#define LOG_LOCAL     ///< Enable Block-level logging (a lot of overhead, use sparingly)
+#define LOG_LOCAL     ///< Enable Block-level logging (a lot of overhead, use sparingly)
 
 #endif // MAIN_HPP

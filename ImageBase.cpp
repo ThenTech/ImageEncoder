@@ -147,8 +147,10 @@ bool dc::ImageProcessor::process(uint8_t * const source_block_buffer) {
  *          Whether this was called after encoding (true) or decoding (false).
  */
 void dc::ImageProcessor::saveResult(bool encoded) const {
-    const size_t pad          = (8 - (this->writer->get_position() % 8u)) % 8u; ///< Pad last byte to next full byte
-    const size_t total_length = (this->writer->get_position() + pad) / 8u;      ///< Total final write length
+    // Pad last byte to next full byte
+    this->writer->flush();
+
+    const size_t total_length = this->writer->get_position() / 8u;  // Total final write length in bytes
 
     #if 1
         // This will only write whole bytes; if pos % 8 != 0, last byte is skipped

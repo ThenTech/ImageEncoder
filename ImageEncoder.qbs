@@ -18,6 +18,8 @@ Project {
             "Encoder.cpp",
             "Encoder.hpp",
             "Exceptions.hpp",
+            "Huffman.cpp",
+            "Huffman.hpp",
             "ImageBase.cpp",
             "ImageBase.hpp",
             "Logger.cpp",

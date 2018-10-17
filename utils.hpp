@@ -207,6 +207,14 @@ namespace util {
     }
 
     /**
+     * \brief Return the size in bits of the given type.
+     */
+    template<class T>
+    constexpr inline size_t size_of(void) {
+        return sizeof(T) * 8u;
+    }
+
+    /**
      *  \brief   Cast enum type to underlining data type.
      *  \param   e
      *      The enum value to cast.
