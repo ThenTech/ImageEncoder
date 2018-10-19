@@ -58,10 +58,10 @@ namespace algo {
     /**
      *  Data struct for Huffman dictionary entries.
      */
-    typedef struct {
+    struct Codeword {
         uint32_t word;
         uint32_t len;
-    } Codeword;
+    };
 
     /**
      *  @brief Huffman class
@@ -73,7 +73,10 @@ namespace algo {
 
             std::unordered_map<T, Codeword> dict;
 
-            size_t buildDict(const algo::Node<> * const, std::vector<bool>);
+            void add_huffman_dict_header(uint32_t, uint32_t, util::BitStreamWriter&);
+            bool read_huffman_dict_header(util::BitStreamReader&, uint32_t&, uint32_t&);
+
+            void buildDict(const algo::Node<> * const, std::vector<bool>);
             void decode(const algo::Node<> * const, util::BitStreamReader&, util::BitStreamWriter&);
 
             void deleteTree(algo::Node<>*);
@@ -89,8 +92,11 @@ namespace algo {
             void printDict(void);
             void printTree(void);
 
-            static constexpr size_t KEY_BITS  = util::size_of<T>();
-            static constexpr size_t SIZE_BITS = util::size_of<T>();
+            static constexpr size_t KEY_BITS  = util::size_of<T>(); ///< Bit length for keys in Huffman dict
+
+            static constexpr size_t DICT_HDR_HAS_ITEMS_BITS  = 1u;  ///< Whether there are dictionary items following (bit length)
+            static constexpr size_t DICT_HDR_SEQ_LENGTH_BITS = 7u;  ///< Amunt of bits to represent the length of following items
+            static constexpr size_t DICT_HDR_ITEM_BITS       = 4u;  ///< Amunt of bits to represent the length of following items
     };
 
     extern template class Node<uint8_t>;

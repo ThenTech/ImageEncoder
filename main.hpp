@@ -23,6 +23,6 @@
 #endif // 1
 
 //#define LOG_OFF       ///< Force logging off
-#define LOG_LOCAL     ///< Enable Block-level logging (a lot of overhead, use sparingly)
+//#define LOG_LOCAL     ///< Enable Block-level logging (a lot of overhead, use sparingly)
 
 #endif // MAIN_HPP
