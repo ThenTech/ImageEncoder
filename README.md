@@ -1,5 +1,5 @@
-# ImageEncoder
-#### William Thenaers - v0.0.0.7
+# [ImageEncoder](https://github.com/Wosser1sProductions/ImageEncoder) ![version](https://img.shields.io/badge/release-v0.0.0.7-brightgreen.svg)
+#### William Thenaers
 
 ## Build
 1. Install g++\-7 with the commands in install_g++.sh
