@@ -14,9 +14,12 @@ util::Logger util::Logger::instance;
 
 /**
  *  Synbols for printing an image to the console.
+ *
+ *  █
+ *  std::string_format("%c", 219)
+ *  219
  */
-// Using "█" is logged, but only std::string_format("%c", 219) is printed to console...
-const std::string util::Logger::FILL  = std::string_format("%c", 219); // std::string_format("%c", 219)  char 219  █
+const std::string util::Logger::FILL  = "#";
 const std::string util::Logger::EMPTY = " ";
 
 /**
@@ -121,4 +124,35 @@ void util::Logger::Write(const std::string &text, bool timestamp) {
  */
 void util::Logger::WriteLn(const std::string &text, bool timestamp) {
     util::Logger::Write(text + "\n", timestamp);
+}
+
+/**
+ *  @brief  Write a progress bar to the console.
+ *  @param  iteration
+ *  @param  total
+ */
+void util::Logger::WriteProgress(const size_t& iteration, const size_t& total) {
+    static constexpr size_t LEN = 55u;
+    static size_t stepu = 0u;
+
+    const bool done = (iteration == total);
+
+    if (iteration == 0) {
+        stepu = size_t(float(total) / std::min(LEN, total));
+    } else if (done || iteration % stepu == 0) {
+        const float progress = float(iteration) / total;
+
+        const size_t filled_len = std::min(LEN, size_t(LEN * progress));
+
+        std::cout << "\rProgress |"
+                  << std::string(filled_len, util::Logger::FILL[0])
+                  << std::string(LEN - filled_len, '-')
+                  << "| "
+                  << std::string_format("%6.2f%%", progress * 100.0f)
+                  << std::flush;
+
+        if (done) {
+            std::cout << std::endl;
+        }
+    }
 }

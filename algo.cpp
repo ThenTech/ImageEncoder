@@ -75,7 +75,7 @@ void algo::createZigzagLUT(std::vector<algo::Position_t> &vec, const size_t size
 
         vec[i] = algo::Position_t {
             uint8_t(x + y),
-            ((int8_t(x - y) & 1) ? y : x),  // not divisible by 2 => y else x
+            ((int8_t(x - y) & 0x1) ? y : x),  // not divisible by 2 => y else x
             x,
             y
         };

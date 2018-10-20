@@ -45,7 +45,7 @@ dc::MatrixReader<size>::~MatrixReader() {
 template<size_t size>
 dc::MatrixReader<> dc::MatrixReader<size>::fromBitstream(util::BitStreamReader &reader) {
     const uint32_t bit_size = reader.get(dc::MatrixReader<>::SIZE_LEN_BITS);
-    uint32_t matrix[size * size];
+    uint32_t matrix[size * size] = { 0u };
 
     for (size_t y = 0; y < size; y++) {
         for (size_t x = 0; x < size; x++) {

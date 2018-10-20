@@ -10,6 +10,7 @@
 #include <type_traits>
 #include <sstream>
 #include <memory>
+#include <chrono>
 
 #ifdef _MSC_VER
     #include <intrin.h>
@@ -162,6 +163,41 @@ namespace std {
 
 namespace util {
     /**
+     *  Chrono::time_point alias.
+     */
+    using timepoint_t = std::chrono::time_point<std::chrono::steady_clock>;
+
+    /**
+     *  @brief  Return a timepoint at the current time.
+     */
+    [[maybe_unused]] static inline timepoint_t TimerStart(void) {
+        return std::chrono::steady_clock::now();
+    }
+
+    /**
+     *  @brief  Return the time in ns that elepsed from start.
+     */
+    [[maybe_unused]]
+    static inline int64_t TimerDuration_ns(const timepoint_t& start) {
+        const timepoint_t end = std::chrono::steady_clock::now();
+        return std::chrono::duration_cast<std::chrono::nanoseconds>(end - start).count();
+    }
+
+    /**
+     *  @brief  Return the time in ms that elepsed from start.
+     */
+    [[maybe_unused]] static inline double TimerDuration_ms(const timepoint_t& start) {
+        return double(util::TimerDuration_ns(start)) / 1.0e6;
+    }
+
+    /**
+     *  @brief  Return the time in s that elepsed from start.
+     */
+    [[maybe_unused]] static inline double TimerDuration_s(const timepoint_t& start) {
+        return double(util::TimerDuration_ns(start)) / 1.0e9;
+    }
+
+    /**
      * \brief  Find First Set
      *         This function identifies the least significant index or position of the
      *         bits set to one in the word.
@@ -204,6 +240,18 @@ namespace util {
         }
 
         return bits;
+    }
+
+    /**
+     *  @brief  Round the given bits to the next byte.
+     *
+     *  @param  bits
+     *      The amount of bits to round to a byte.
+     *  @return Returns the next byte if bits has 1-7 surplus bits
+     *          or the current byte if no surplus bits.
+     */
+    [[maybe_unused]] static inline size_t round_to_byte(size_t bits) {
+        return (bits + (8u - (bits % 8u)) % 8u) / 8u;
     }
 
     /**
@@ -401,6 +449,28 @@ namespace util {
     template <class T>
     [[maybe_unused]] static inline void deallocArray(T* a) {
         delete[] a;
+    }
+
+    /**	\brief	Reallocate the given array to a new array with different size.
+     *          Elements will be copied to the new array.
+     *
+     *	\tparam	T
+     *		The type of object to allocate.
+     *	\param	*&a
+     *		A reference to a pointer to the object to reallocate.
+     *	\param	&old_size
+     *		The old length of the array in the first dimension, by reference.
+     *      old_size will contain the new length after reallocation.
+     *	\param	new_size
+     *		The new length of the array in the first dimension.
+     */
+    template <class T>
+    [[maybe_unused]] static inline void reallocArray(T*& a, size_t& old_size, size_t new_size) {
+        T* new_array = util::allocArray<uint8_t>(new_size);
+        std::copy_n(a, std::min(old_size, new_size), new_array);
+        util::deallocArray(a);
+        a = new_array;
+        old_size = new_size;
     }
 
     /**	\brief	Allocate y arrays of objects of type T and length x on the heap.

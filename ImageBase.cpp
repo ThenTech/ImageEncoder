@@ -2,6 +2,7 @@
 #include "utils.hpp"
 #include "Logger.hpp"
 #include "Block.hpp"
+#include "Huffman.hpp"
 
 /**
  *  @brief  Default ctor
@@ -75,13 +76,30 @@ dc::ImageProcessor::ImageProcessor(const std::string &source_file,
  */
 dc::ImageProcessor::ImageProcessor(const std::string &source_file, const std::string &dest_file)
     : ImageBase(source_file, 0u, 0u),                            ///< Create stream
-      quant_m(dc::MatrixReader<>::fromBitstream(*this->reader)), ///< Read matrix from stream
       dest_file(dest_file),
       blocks(util::allocVar<std::vector<Block<>*>>())
 {
     // Assume input is encoded image and settings should be determined from the bytestream
 
-    // Matrix was already read here
+    // Perform Huffman decompress (if used, first bit is '1' else '0')
+    algo::Huffman<> hm;
+    util::BitStreamReader *hm_output = hm.decode(*this->reader);
+    util::Logger::WriteLn("", false);
+
+    #ifdef LOG_LOCAL
+        util::Logger::WriteLn("\n", false);
+        hm.printDict();
+        util::Logger::WriteLn("\n", false);
+    #endif
+
+    // Replace reader with result from decompressed Huffman stream
+    if (hm_output != nullptr) {
+        util::deallocVar(this->reader);
+        this->reader = hm_output;
+    }
+
+    // Read Matrix
+    this->quant_m = dc::MatrixReader<>::fromBitstream(*this->reader);
 
     // Read other settings in same order as they were presumably written to the encoded stream
     this->use_rle = this->reader->get(dc::ImageProcessor::RLE_BITS);
@@ -147,10 +165,7 @@ bool dc::ImageProcessor::process(uint8_t * const source_block_buffer) {
  *          Whether this was called after encoding (true) or decoding (false).
  */
 void dc::ImageProcessor::saveResult(bool encoded) const {
-    // Pad last byte to next full byte
-    this->writer->flush();
-
-    const size_t total_length = this->writer->get_position() / 8u;  // Total final write length in bytes
+    const size_t total_length = this->writer->get_last_byte_position();  // Total final write length in bytes
 
     #if 1
         // This will only write whole bytes; if pos % 8 != 0, last byte is skipped
@@ -164,9 +179,10 @@ void dc::ImageProcessor::saveResult(bool encoded) const {
         util::write(file, *this->writer);
     #endif
 
-    util::Logger::WriteLn(std::string_format("[ImageProcessor] Total file length: %d bytes (%.2f%% %scompression).",
+    util::Logger::WriteLn(std::string_format("[ImageProcessor] Original file size: %8d bytes", this->raw->size()));
+    util::Logger::WriteLn(std::string_format("[ImageProcessor]       %scoded size: %8d bytes  => Ratio: %.2f%%",
+                                             (encoded ? "En" : "De"),
                                              total_length,
-                                             (float(total_length) / this->raw->size() * 100),
-                                             (encoded ? "" : "de")));
+                                             (float(total_length) / this->raw->size() * 100)));
     util::Logger::WriteLn("[ImageProcessor] Saved file at: " + this->dest_file);
 }

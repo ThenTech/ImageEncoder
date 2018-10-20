@@ -1,0 +1,253 @@
+<!doctype html>
+<html>
+<head>
+<meta charset='UTF-8'><meta name='viewport' content='width=device-width initial-scale=1'>
+<title>README</title><link href='https://fonts.googleapis.com/css?family=Open+Sans:400italic,700italic,700,400&subset=latin,latin-ext' rel='stylesheet' type='text/css' /><style type='text/css'>html {overflow-x: initial !important;}:root { --bg-color:#ffffff; --text-color:#333333; --select-text-bg-color:#B5D6FC; --select-text-font-color:auto; --monospace:"Lucida Console",Consolas,"Courier",monospace; }
+html { font-size: 14px; background-color: var(--bg-color); color: var(--text-color); font-family: "Helvetica Neue", Helvetica, Arial, sans-serif; -webkit-font-smoothing: antialiased; }
+body { margin: 0px; padding: 0px; height: auto; bottom: 0px; top: 0px; left: 0px; right: 0px; font-size: 1rem; line-height: 1.42857; overflow-x: hidden; background: inherit; }
+iframe { margin: auto; }
+a.url { word-break: break-all; }
+a:active, a:hover { outline: 0px; }
+.in-text-selection, ::selection { text-shadow: none; background: var(--select-text-bg-color); color: var(--select-text-font-color); }
+#write { margin: 0px auto; height: auto; width: inherit; word-break: normal; word-wrap: break-word; position: relative; white-space: normal; padding-bottom: 70px; overflow-x: visible; }
+.first-line-indent #write div, .first-line-indent #write li, .first-line-indent #write p { text-indent: 2em; }
+.first-line-indent #write div :not(p):not(div), .first-line-indent #write div.md-htmlblock-container, .first-line-indent #write p *, .first-line-indent pre { text-indent: 0px; }
+.for-image #write { padding-left: 8px; padding-right: 8px; }
+body.typora-export { padding-left: 30px; padding-right: 30px; }
+@media screen and (max-width: 500px) {
+  body.typora-export { padding-left: 0px; padding-right: 0px; }
+  .CodeMirror-sizer { margin-left: 0px !important; }
+  .CodeMirror-gutters { display: none !important; }
+}
+#write > blockquote:first-child, #write > div:first-child, #write > figure:first-child, #write > ol:first-child, #write > p:first-child, #write > pre:first-child, #write > ul:first-child { margin-top: 30px; }
+#write li > figure:first-child { margin-top: -20px; }
+#write ol, #write ul { position: relative; }
+img { max-width: 100%; vertical-align: middle; }
+button, input, select, textarea { color: inherit; font-style: inherit; font-variant: inherit; font-weight: inherit; font-stretch: inherit; font-size: inherit; line-height: inherit; font-family: inherit; }
+input[type="checkbox"], input[type="radio"] { line-height: normal; padding: 0px; }
+*, ::after, ::before { box-sizing: border-box; }
+#write h1, #write h2, #write h3, #write h4, #write h5, #write h6, #write p, #write pre { width: inherit; }
+#write h1, #write h2, #write h3, #write h4, #write h5, #write h6, #write p { position: relative; }
+h1, h2, h3, h4, h5, h6 { break-after: avoid-page; break-inside: avoid; orphans: 2; }
+p { orphans: 4; }
+h1 { font-size: 2rem; }
+h2 { font-size: 1.8rem; }
+h3 { font-size: 1.6rem; }
+h4 { font-size: 1.4rem; }
+h5 { font-size: 1.2rem; }
+h6 { font-size: 1rem; }
+.md-math-block, .md-rawblock, h1, h2, h3, h4, h5, h6, p { margin-top: 1rem; margin-bottom: 1rem; }
+.hidden { display: none; }
+.md-blockmeta { color: rgb(204, 204, 204); font-weight: 700; font-style: italic; }
+a { cursor: pointer; }
+sup.md-footnote { padding: 2px 4px; background-color: rgba(238, 238, 238, 0.7); color: rgb(85, 85, 85); border-radius: 4px; cursor: pointer; }
+sup.md-footnote a, sup.md-footnote a:hover { color: inherit; text-transform: inherit; text-decoration: inherit; }
+#write input[type="checkbox"] { cursor: pointer; width: inherit; height: inherit; }
+figure { overflow-x: auto; margin: 1.2em 0px; max-width: calc(100% + 16px); padding: 0px; }
+figure > table { margin: 0px !important; }
+tr { break-inside: avoid; break-after: auto; }
+thead { display: table-header-group; }
+table { border-collapse: collapse; border-spacing: 0px; width: 100%; overflow: auto; break-inside: auto; text-align: left; }
+table.md-table td { min-width: 80px; }
+.CodeMirror-gutters { border-right: 0px; background-color: inherit; }
+.CodeMirror { text-align: left; }
+.CodeMirror-placeholder { opacity: 0.3; }
+.CodeMirror pre { padding: 0px 4px; }
+.CodeMirror-lines { padding: 0px; }
+div.hr:focus { cursor: none; }
+#write pre { white-space: pre-wrap; }
+#write.fences-no-line-wrapping pre { white-space: pre; }
+#write pre.ty-contain-cm { white-space: normal; }
+.CodeMirror-gutters { margin-right: 4px; }
+.md-fences { font-size: 0.9rem; display: block; break-inside: avoid; text-align: left; overflow: visible; white-space: pre; background: inherit; position: relative !important; }
+.md-diagram-panel { width: 100%; margin-top: 10px; text-align: center; padding-top: 0px; padding-bottom: 8px; overflow-x: auto; }
+#write .md-fences.mock-cm { white-space: pre-wrap; }
+.md-fences.md-fences-with-lineno { padding-left: 0px; }
+#write.fences-no-line-wrapping .md-fences.mock-cm { white-space: pre; overflow-x: auto; }
+.md-fences.mock-cm.md-fences-with-lineno { padding-left: 8px; }
+.CodeMirror-line, twitterwidget { break-inside: avoid; }
+.footnotes { opacity: 0.8; font-size: 0.9rem; margin-top: 1em; margin-bottom: 1em; }
+.footnotes + .footnotes { margin-top: 0px; }
+.md-reset { margin: 0px; padding: 0px; border: 0px; outline: 0px; vertical-align: top; background: 0px 0px; text-decoration: none; text-shadow: none; float: none; position: static; width: auto; height: auto; white-space: nowrap; cursor: inherit; -webkit-tap-highlight-color: transparent; line-height: normal; font-weight: 400; text-align: left; box-sizing: content-box; direction: ltr; }
+li div { padding-top: 0px; }
+blockquote { margin: 1rem 0px; }
+li .mathjax-block, li p { margin: 0.5rem 0px; }
+li { margin: 0px; position: relative; }
+blockquote > :last-child { margin-bottom: 0px; }
+blockquote > :first-child, li > :first-child { margin-top: 0px; }
+.footnotes-area { color: rgb(136, 136, 136); margin-top: 0.714rem; padding-bottom: 0.143rem; white-space: normal; }
+#write .footnote-line { white-space: pre-wrap; }
+@media print {
+  body, html { border: 1px solid transparent; height: 99%; break-after: avoid; break-before: avoid; }
+  #write { margin-top: 0px; border-color: transparent !important; }
+  .typora-export * { -webkit-print-color-adjust: exact; }
+  html.blink-to-pdf { font-size: 13px; }
+  .typora-export #write { padding-left: 1cm; padding-right: 1cm; padding-bottom: 0px; break-after: avoid; }
+  .typora-export #write::after { height: 0px; }
+  @page { margin: 20mm 0px; }
+}
+.footnote-line { margin-top: 0.714em; font-size: 0.7em; }
+a img, img a { cursor: pointer; }
+pre.md-meta-block { font-size: 0.8rem; min-height: 0.8rem; white-space: pre-wrap; background: rgb(204, 204, 204); display: block; overflow-x: hidden; }
+p > img:only-child { display: block; margin: auto; }
+p > .md-image:only-child { display: inline-block; width: 100%; text-align: center; }
+#write .MathJax_Display { margin: 0.8em 0px 0px; }
+.md-math-block { width: 100%; }
+.md-math-block:not(:empty)::after { display: none; }
+[contenteditable="true"]:active, [contenteditable="true"]:focus { outline: 0px; box-shadow: none; }
+.md-task-list-item { position: relative; list-style-type: none; }
+.task-list-item.md-task-list-item { padding-left: 0px; }
+.md-task-list-item > input { position: absolute; top: 0px; left: 0px; margin-left: -1.2em; margin-top: calc(1em - 10px); }
+.math { font-size: 1rem; }
+.md-toc { min-height: 3.58rem; position: relative; font-size: 0.9rem; border-radius: 10px; }
+.md-toc-content { position: relative; margin-left: 0px; }
+.md-toc-content::after, .md-toc::after { display: none; }
+.md-toc-item { display: block; color: rgb(65, 131, 196); }
+.md-toc-item a { text-decoration: none; }
+.md-toc-inner:hover { }
+.md-toc-inner { display: inline-block; cursor: pointer; }
+.md-toc-h1 .md-toc-inner { margin-left: 0px; font-weight: 700; }
+.md-toc-h2 .md-toc-inner { margin-left: 2em; }
+.md-toc-h3 .md-toc-inner { margin-left: 4em; }
+.md-toc-h4 .md-toc-inner { margin-left: 6em; }
+.md-toc-h5 .md-toc-inner { margin-left: 8em; }
+.md-toc-h6 .md-toc-inner { margin-left: 10em; }
+@media screen and (max-width: 48em) {
+  .md-toc-h3 .md-toc-inner { margin-left: 3.5em; }
+  .md-toc-h4 .md-toc-inner { margin-left: 5em; }
+  .md-toc-h5 .md-toc-inner { margin-left: 6.5em; }
+  .md-toc-h6 .md-toc-inner { margin-left: 8em; }
+}
+a.md-toc-inner { font-size: inherit; font-style: inherit; font-weight: inherit; line-height: inherit; }
+.footnote-line a:not(.reversefootnote) { color: inherit; }
+.md-attr { display: none; }
+.md-fn-count::after { content: "."; }
+code, pre, samp, tt { font-family: var(--monospace); }
+kbd { margin: 0px 0.1em; padding: 0.1em 0.6em; font-size: 0.8em; color: rgb(36, 39, 41); background: rgb(255, 255, 255); border: 1px solid rgb(173, 179, 185); border-radius: 3px; box-shadow: rgba(12, 13, 14, 0.2) 0px 1px 0px, rgb(255, 255, 255) 0px 0px 0px 2px inset; white-space: nowrap; vertical-align: middle; }
+.md-comment { color: rgb(162, 127, 3); opacity: 0.8; font-family: var(--monospace); }
+code { text-align: left; vertical-align: initial; }
+a.md-print-anchor { white-space: pre !important; border-width: initial !important; border-style: none !important; border-color: initial !important; display: inline-block !important; position: absolute !important; width: 1px !important; right: 0px !important; outline: 0px !important; background: 0px 0px !important; text-decoration: initial !important; text-shadow: initial !important; }
+.md-inline-math .MathJax_SVG .noError { display: none !important; }
+.md-math-block .MathJax_SVG_Display { text-align: center; margin: 0px; position: relative; text-indent: 0px; max-width: none; max-height: none; min-height: 0px; min-width: 100%; width: auto; overflow-y: hidden; display: block !important; }
+.MathJax_SVG_Display, .md-inline-math .MathJax_SVG_Display { width: auto; margin: inherit; display: inline-block !important; }
+.MathJax_SVG .MJX-monospace { font-family: var(--monospace); }
+.MathJax_SVG .MJX-sans-serif { font-family: sans-serif; }
+.MathJax_SVG { display: inline; font-style: normal; font-weight: 400; line-height: normal; zoom: 90%; text-indent: 0px; text-align: left; text-transform: none; letter-spacing: normal; word-spacing: normal; word-wrap: normal; white-space: nowrap; float: none; direction: ltr; max-width: none; max-height: none; min-width: 0px; min-height: 0px; border: 0px; padding: 0px; margin: 0px; }
+.MathJax_SVG * { transition: none; }
+.MathJax_SVG_Display svg { vertical-align: middle !important; margin-bottom: 0px !important; }
+.os-windows.monocolor-emoji .md-emoji { font-family: "Segoe UI Symbol", sans-serif; }
+.md-diagram-panel > svg { max-width: 100%; }
+[lang="mermaid"] svg, [lang="flow"] svg { max-width: 100%; }
+[lang="mermaid"] .node text { font-size: 1rem; }
+table tr th { border-bottom: 0px; }
+video { max-width: 100%; display: block; margin: 0px auto; }
+iframe { max-width: 100%; width: 100%; border: none; }
+.highlight td, .highlight tr { border: 0px; }
+
+
+:root { --side-bar-bg-color: #fafafa; --control-text-color: #777; }
+@font-face { font-family: "Open Sans"; font-style: normal; font-weight: normal; src: local("Open Sans Regular"), url("./github/400.woff") format("woff"); }
+@font-face { font-family: "Open Sans"; font-style: italic; font-weight: normal; src: local("Open Sans Italic"), url("./github/400i.woff") format("woff"); }
+@font-face { font-family: "Open Sans"; font-style: normal; font-weight: bold; src: local("Open Sans Bold"), url("./github/700.woff") format("woff"); }
+@font-face { font-family: "Open Sans"; font-style: italic; font-weight: bold; src: local("Open Sans Bold Italic"), url("./github/700i.woff") format("woff"); }
+html { font-size: 16px; }
+body { font-family: "Open Sans", "Clear Sans", "Helvetica Neue", Helvetica, Arial, sans-serif; color: rgb(51, 51, 51); line-height: 1.6; }
+#write { max-width: 860px; margin: 0px auto; padding: 20px 30px 100px; }
+#write > ul:first-child, #write > ol:first-child { margin-top: 30px; }
+body > :first-child { margin-top: 0px !important; }
+body > :last-child { margin-bottom: 0px !important; }
+a { color: rgb(65, 131, 196); }
+h1, h2, h3, h4, h5, h6 { position: relative; margin-top: 1rem; margin-bottom: 1rem; font-weight: bold; line-height: 1.4; cursor: text; }
+h1:hover a.anchor, h2:hover a.anchor, h3:hover a.anchor, h4:hover a.anchor, h5:hover a.anchor, h6:hover a.anchor { text-decoration: none; }
+h1 tt, h1 code { font-size: inherit; }
+h2 tt, h2 code { font-size: inherit; }
+h3 tt, h3 code { font-size: inherit; }
+h4 tt, h4 code { font-size: inherit; }
+h5 tt, h5 code { font-size: inherit; }
+h6 tt, h6 code { font-size: inherit; }
+h1 { padding-bottom: 0.3em; font-size: 2.25em; line-height: 1.2; border-bottom: 1px solid rgb(238, 238, 238); }
+h2 { padding-bottom: 0.3em; font-size: 1.75em; line-height: 1.225; border-bottom: 1px solid rgb(238, 238, 238); }
+h3 { font-size: 1.5em; line-height: 1.43; }
+h4 { font-size: 1.25em; }
+h5 { font-size: 1em; }
+h6 { font-size: 1em; color: rgb(119, 119, 119); }
+p, blockquote, ul, ol, dl, table { margin: 0.8em 0px; }
+li > ol, li > ul { margin: 0px; }
+hr { height: 2px; padding: 0px; margin: 16px 0px; background-color: rgb(231, 231, 231); border: 0px none; overflow: hidden; box-sizing: content-box; }
+body > h2:first-child { margin-top: 0px; padding-top: 0px; }
+body > h1:first-child { margin-top: 0px; padding-top: 0px; }
+body > h1:first-child + h2 { margin-top: 0px; padding-top: 0px; }
+body > h3:first-child, body > h4:first-child, body > h5:first-child, body > h6:first-child { margin-top: 0px; padding-top: 0px; }
+a:first-child h1, a:first-child h2, a:first-child h3, a:first-child h4, a:first-child h5, a:first-child h6 { margin-top: 0px; padding-top: 0px; }
+h1 p, h2 p, h3 p, h4 p, h5 p, h6 p { margin-top: 0px; }
+li p.first { display: inline-block; }
+ul, ol { padding-left: 30px; }
+ul:first-child, ol:first-child { margin-top: 0px; }
+ul:last-child, ol:last-child { margin-bottom: 0px; }
+blockquote { border-left: 4px solid rgb(223, 226, 229); padding: 0px 15px; color: rgb(119, 119, 119); }
+blockquote blockquote { padding-right: 0px; }
+table { padding: 0px; word-break: initial; }
+table tr { border-top: 1px solid rgb(223, 226, 229); margin: 0px; padding: 0px; }
+table tr:nth-child(2n), thead { background-color: rgb(248, 248, 248); }
+table tr th { font-weight: bold; border-width: 1px 1px 0px; border-top-style: solid; border-right-style: solid; border-left-style: solid; border-top-color: rgb(223, 226, 229); border-right-color: rgb(223, 226, 229); border-left-color: rgb(223, 226, 229); border-image: initial; border-bottom-style: initial; border-bottom-color: initial; text-align: left; margin: 0px; padding: 6px 13px; }
+table tr td { border: 1px solid rgb(223, 226, 229); text-align: left; margin: 0px; padding: 6px 13px; }
+table tr th:first-child, table tr td:first-child { margin-top: 0px; }
+table tr th:last-child, table tr td:last-child { margin-bottom: 0px; }
+.CodeMirror-lines { padding-left: 4px; }
+.code-tooltip { box-shadow: rgba(0, 28, 36, 0.3) 0px 1px 1px 0px; border-top: 1px solid rgb(238, 242, 242); }
+.md-fences, code, tt { border: 1px solid rgb(231, 234, 237); background-color: rgb(248, 248, 248); border-radius: 3px; padding: 2px 4px 0px; font-size: 0.9em; }
+code { background-color: rgb(243, 244, 244); padding: 0px 4px 2px; }
+.md-fences { margin-bottom: 15px; margin-top: 15px; padding: 8px 1em 6px; }
+.md-task-list-item > input { margin-left: -1.3em; }
+@media screen and (min-width: 914px) {
+}
+@media print {
+  html { font-size: 13px; }
+  table, pre { break-inside: avoid; }
+  pre { word-wrap: break-word; }
+}
+.md-fences { background-color: rgb(248, 248, 248); }
+#write pre.md-meta-block { padding: 1rem; font-size: 85%; line-height: 1.45; background-color: rgb(247, 247, 247); border: 0px; border-radius: 3px; color: rgb(119, 119, 119); margin-top: 0px !important; }
+.mathjax-block > .code-tooltip { bottom: 0.375rem; }
+.md-mathjax-midline { background: rgb(250, 250, 250); }
+#write > h3.md-focus::before { left: -1.5625rem; top: 0.375rem; }
+#write > h4.md-focus::before { left: -1.5625rem; top: 0.285714rem; }
+#write > h5.md-focus::before { left: -1.5625rem; top: 0.285714rem; }
+#write > h6.md-focus::before { left: -1.5625rem; top: 0.285714rem; }
+.md-image > .md-meta { border-radius: 3px; padding: 2px 0px 0px 4px; font-size: 0.9em; color: inherit; }
+.md-tag { color: rgb(167, 167, 167); opacity: 1; }
+.md-toc { margin-top: 20px; padding-bottom: 20px; }
+.sidebar-tabs { border-bottom: none; }
+#typora-quick-open { border: 1px solid rgb(221, 221, 221); background-color: rgb(248, 248, 248); }
+#typora-quick-open-item { background-color: rgb(250, 250, 250); border-color: rgb(254, 254, 254) rgb(229, 229, 229) rgb(229, 229, 229) rgb(238, 238, 238); border-style: solid; border-width: 1px; }
+.on-focus-mode blockquote { border-left-color: rgba(85, 85, 85, 0.12); }
+header, .context-menu, .megamenu-content, footer { font-family: "Segoe UI", Arial, sans-serif; }
+.file-node-content:hover .file-node-icon, .file-node-content:hover .file-node-open-state { visibility: visible; }
+.mac-seamless-mode #typora-sidebar { background-color: var(--side-bar-bg-color); }
+.md-lang { color: rgb(180, 101, 77); }
+.html-for-mac .context-menu { --item-hover-bg-color: #E6F0FE; }
+
+
+
+
+
+
+</style>
+</head>
+<body class='typora-export os-windows' >
+<div  id='write'  class = 'is-node'><h1><a name='header-n0' class='md-header-anchor '></a>ImageEncoder</h1><h4><a name='header-n2' class='md-header-anchor '></a>William Thenaers - v0.0.0.7</h4><h2><a name='header-n3' class='md-header-anchor '></a>Build</h2><ol start='' ><li><p>Install g++-7 with the commands in install_g++.sh</p></li><li><p>Build the encoder with:
+<code>make encoder</code></p><p>Build the decoder with:
+<code>make decoder</code></p><p>Or build both with:
+<code>make</code> or <code>make all</code></p></li><li><p>Got to the ./bin folder and run the encoder/decoder 
+with a file containing the settings.</p></li></ol><h2><a name='header-n13' class='md-header-anchor '></a>Info</h2><ul><li><p>Linux builds (through Win10 bash) and Windows builds are provided in  <code>./bin</code></p></li><li><p>A QtCreator .qbs project file is included for debugging, the makefile will always build for release by default.</p></li><li><p>Everything was implemented according to the assignment, i.e. nothing is excluded.</p></li><li><p>One extra thing is an offset for each pixel before the DCT step (and after the iDCT), here the value of 128 is subtracted from the pixels (and added during decoding) to make the DCT components smaller and easier to fit in less space.</p></li><li><p>The encoded image has the following structure:</p><figure><table><thead><tr><th>Property</th><th style='text-align:center;' >Amount of bits</th></tr></thead><tbody><tr><td>Bit length for quant matrix coeff</td><td style='text-align:center;' ><code>5</code></td></tr><tr><td>Quant matrix coeffs</td><td style='text-align:center;' ><code>16 * bit_len</code></td></tr><tr><td>Whether to use RLE</td><td style='text-align:center;' ><code>1</code></td></tr><tr><td>Image width</td><td style='text-align:center;' ><code>15</code></td></tr><tr><td>Image height</td><td style='text-align:center;' ><code>15</code></td></tr><tr><td>Block data</td><td style='text-align:center;' >different for every block</td></tr><tr><td>Bit length for data in block</td><td style='text-align:center;' ><code>5</code></td></tr><tr><td>Data length (if using RLE)</td><td style='text-align:center;' ><code>block bit_len</code></td></tr></tbody></table></figure><p>For the example quant matrix in the assignment, the header is 20.5 bytes of data.</p></li><li><p>The en/decoder will give a compression percentage after writing the resulting file. (<code>&lt; 100.0</code>: result is smaller, <code>&gt; 100.0</code>: result is bigger )</p></li><li><p>The Block size is provided as a Template argument and can be changed in Block.hpp.
+Everything should work as expected, only an 8x8 quant matrix is needed to continue.
+However, resulting images do not seem as good in comparison with a 4x4 block size.</p></li><li><p>A single example is provided (the image from the iPyhton notebooks) for convenience.
+Other testing images used during development can be added on request.</p></li></ul><h3><a name='header-n60' class='md-header-anchor '></a>Extra</h3><ul><li><p>The encoder now has an additional step to apply Huffman encoding on the final bitstream. This will also be decompressed by the decoder, if set in the encoded image. The inclusion of Huffman encoding can be toggled through the <code>ENABLE_HUFFMAN</code> macro in <code>main.hpp</code> or through the makefile.</p><p>When enabled, the first bit of the resulting stream will be set to <code>1</code>. The following structure will appear instead of the encoded image:</p><figure><table><thead><tr><th>Property</th><th style='text-align:center;' >Amount of bits</th></tr></thead><tbody><tr><td>Huffman encoding used</td><td style='text-align:center;' ><code>1</code></td></tr><tr><td>Huffman table header group</td><td style='text-align:center;' ><code>12</code></td></tr><tr><td><strong>[HDR]</strong> Has sequence</td><td style='text-align:center;' ><code>1 of 12</code></td></tr><tr><td><strong>[HDR]</strong> Sequence length</td><td style='text-align:center;' ><code>7 of 12</code></td></tr><tr><td><strong>[HDR]</strong> Amount of bits for vals</td><td style='text-align:center;' ><code>4 of 12</code></td></tr><tr><td>Sequence entry {key:val}</td><td style='text-align:center;' ><code>(8 + val_bit_len) * seq_len</code></td></tr><tr><td>Huffman encoded data</td><td style='text-align:center;' >rest</td></tr></tbody></table></figure><p>The occurrences of every byte in the stream are counted, and a heap is constructed to build a tree from. This tree is then converted to a dictionary containing keys and the paths to follow in the tree.
+After creating the Huffman dictionary, the frequencies of each path length are determined.
+<code>{key: value}</code>-pairs are grouped by their path length. </p><p>A header contains <code>1</code> bit to indicate whether there is a sequence, 7 bits for the length of the sequence (= amount of <code>{key: value}</code>-pairs until the next header) and 4 bits for the amount of bits for each value in this group.
+Afterwards, every byte (size can be changed with template arguments, but using 8 bits limits the
+Huffman dictionary to a manageable 256 entries) is encoded according to the Huffman dictionary.</p><p>If the addition of Huffman encoding results in a bigger image than the already encoded image, the Huffman dictionary will not be included and the original encoded stream will be restored.</p></li><li><p>An elapsed time in milliseconds is now provided after en/decoding.</p></li><li><p>A progress bar indicates how many blocks are already done.</p></li><li><p>By including the <code>-DENABLE_OPENMP</code> compiler flag, the code will build with OpenMP enabled (set in <code>main.hpp</code> or in the makefile). This causes Block functions to run in parallel (where possible) and improves the en/decoding speed. This is however not supported with MSVC, since the loop uses iterators and support for iterators came in OpenMP 3.0 while MSVC only implements features up to version 2.0.</p></li><li><p>Timings and <a href='#header-n113'>test results</a> were added below.</p></li><li><p>A <a href='#header-n255'>class diagram</a> giving an overview of the code was generated through Visual Studio.</p></li></ul><h2><a name='header-n101' class='md-header-anchor '></a>Example</h2><ul><li><p>Original image:</p><p><img src='doc/ex6.png' alt='Original image' referrerPolicy='no-referrer' /></p></li><li><p>The decoder had an &quot;error&quot; where signed encoded data was interpreted as unsigned, and
+consequently every pixel that would contain signed data was wrongly transformed during iDCT, giving these weird uniform areas:</p><p>  <img src='doc/ex6_dec2.png' alt='Signed errors' referrerPolicy='no-referrer' /></p></li><li><p>This was solved by providing a more specific function to check the minimal required bit length to represent a data value.</p><p>e.g. The new function would check if a value could be encoded in x bits, by shifting the value to the left of an int16, and re-shifting it back (to create a signed value), if the result is the same as the original, the value can be encoded using x bits. If not, increase x until it does.
+This way the decoder could do the same thing, because it knows the bit length, and the original value is properly decoded (signed or unsigned).</p><p><img src='doc/ex6_dec.png' alt='Final result' referrerPolicy='no-referrer' /></p></li></ul><h2><a name='header-n113' class='md-header-anchor '></a>Test results</h2><h3><a name='header-n114' class='md-header-anchor '></a>Size statistics</h3><figure><table><thead><tr><th>Example image</th><th style='text-align:center;' >Resolution</th><th style='text-align:right;' >Raw size</th><th style='text-align:right;' >Encoded</th><th style='text-align:right;' >Ratio</th><th style='text-align:right;' >Huffman</th><th style='text-align:right;' >Ratio</th></tr></thead><tbody><tr><td>ex0</td><td style='text-align:center;' ><code>8x8</code></td><td style='text-align:right;' >64b</td><td style='text-align:right;' >82b</td><td style='text-align:right;' >128%</td><td style='text-align:right;' >82b</td><td style='text-align:right;' >128%</td></tr><tr><td>ex1</td><td style='text-align:center;' ><code>936x936</code></td><td style='text-align:right;' >876 096b</td><td style='text-align:right;' >413 210b</td><td style='text-align:right;' >47%</td><td style='text-align:right;' >327 658b</td><td style='text-align:right;' >37%</td></tr><tr><td>ex2</td><td style='text-align:center;' ><code>512x512</code></td><td style='text-align:right;' >262 144b</td><td style='text-align:right;' >104 597b</td><td style='text-align:right;' >40%</td><td style='text-align:right;' >83 274b</td><td style='text-align:right;' >32%</td></tr><tr><td>ex3</td><td style='text-align:center;' ><code>400x400</code></td><td style='text-align:right;' >160 000b</td><td style='text-align:right;' >76 033b</td><td style='text-align:right;' >48%</td><td style='text-align:right;' >61 230b</td><td style='text-align:right;' >38%</td></tr><tr><td>ex4</td><td style='text-align:center;' ><code>4096x912</code></td><td style='text-align:right;' >3 735 552b</td><td style='text-align:right;' >1 834 256b</td><td style='text-align:right;' >49%</td><td style='text-align:right;' >1 473 058b</td><td style='text-align:right;' >39%</td></tr><tr><td>ex5</td><td style='text-align:center;' ><code>2160x2160</code></td><td style='text-align:right;' >4 665 600b</td><td style='text-align:right;' >1 598 931b</td><td style='text-align:right;' >34%</td><td style='text-align:right;' >1 369 376b</td><td style='text-align:right;' >29%</td></tr><tr><td>ex6</td><td style='text-align:center;' ><code>512x256</code></td><td style='text-align:right;' >131 072b</td><td style='text-align:right;' >42 198b</td><td style='text-align:right;' >32%</td><td style='text-align:right;' >34 191b</td><td style='text-align:right;' >26%</td></tr></tbody></table></figure><h3><a name='header-n180' class='md-header-anchor '></a>Timing statistics</h3><figure><table><thead><tr><th>Example image</th><th style='text-align:center;' >Resolution</th><th style='text-align:right;' >Enc Time</th><th style='text-align:right;' >Dec Time</th><th style='text-align:right;' >Huffman enc</th><th style='text-align:right;' >Huffman dec</th><th style='text-align:right;' >OpenMP enc</th><th style='text-align:right;' >OpenMP dec</th></tr></thead><tbody><tr><td>ex0</td><td style='text-align:center;' ><code>8x8</code></td><td style='text-align:right;' >7.0ms</td><td style='text-align:right;' >5.1ms</td><td style='text-align:right;' >8.0ms</td><td style='text-align:right;' >5.5ms</td><td style='text-align:right;' >11.9ms</td><td style='text-align:right;' >5.6ms</td></tr><tr><td>ex1</td><td style='text-align:center;' ><code>936x936</code></td><td style='text-align:right;' >239.8ms</td><td style='text-align:right;' >201.1ms</td><td style='text-align:right;' >266.4ms</td><td style='text-align:right;' >220.2ms</td><td style='text-align:right;' >126.0ms</td><td style='text-align:right;' >79.5ms</td></tr><tr><td>ex2</td><td style='text-align:center;' ><code>512x512</code></td><td style='text-align:right;' >74.8ms</td><td style='text-align:right;' >65.6ms</td><td style='text-align:right;' >85.7ms</td><td style='text-align:right;' >67.9ms</td><td style='text-align:right;' >43.0ms</td><td style='text-align:right;' >29.0ms</td></tr><tr><td>ex3</td><td style='text-align:center;' ><code>400x400</code></td><td style='text-align:right;' >49.0ms</td><td style='text-align:right;' >42.0ms</td><td style='text-align:right;' >57.7ms</td><td style='text-align:right;' >45.6ms</td><td style='text-align:right;' >29.5ms</td><td style='text-align:right;' >20.6ms</td></tr><tr><td>ex4</td><td style='text-align:center;' ><code>4096x912</code></td><td style='text-align:right;' >1019.0ms</td><td style='text-align:right;' >842.1ms</td><td style='text-align:right;' >1139.5ms</td><td style='text-align:right;' >851.26ms</td><td style='text-align:right;' >461.9ms</td><td style='text-align:right;' >327.3ms</td></tr><tr><td>ex5</td><td style='text-align:center;' ><code>2160x2160</code></td><td style='text-align:right;' >1241.7ms</td><td style='text-align:right;' >1060.8ms</td><td style='text-align:right;' >1334.7ms</td><td style='text-align:right;' >1046.7ms</td><td style='text-align:right;' >506.1ms</td><td style='text-align:right;' >373.1ms</td></tr><tr><td>ex6</td><td style='text-align:center;' ><code>512x256</code></td><td style='text-align:right;' >38.5ms</td><td style='text-align:right;' >33.8ms</td><td style='text-align:right;' >46.2ms</td><td style='text-align:right;' >35.3ms</td><td style='text-align:right;' >23.9ms</td><td style='text-align:right;' >17.4ms</td></tr></tbody></table></figure><p><em>Regular</em>, <em>With extra Huffman compression</em> and <em>Huffman with OpenMP</em></p><h2><a name='header-n255' class='md-header-anchor '></a>Class diagram</h2><p><img src='doc/ClassDiagram.png' alt='Class Diagram' referrerPolicy='no-referrer' /></p><p>&nbsp;</p></div>
+</body>
+</html>

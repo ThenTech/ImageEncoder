@@ -35,4 +35,5 @@
 /bin/*.png
 /bin/ex*.txt
 /bin/*.enc
+/bin/*_dec.raw
 *.qbs.user*

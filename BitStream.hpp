@@ -22,7 +22,7 @@ namespace util {
 
             ~BitStream(void) {
                 if (this->managed) {
-                    this->clear();
+                    util::deallocArray(this->buffer);
                 }
             }
 
@@ -38,6 +38,10 @@ namespace util {
                 return this->size;
             }
 
+            inline size_t get_size_bits(void) const {
+                return this->size * 8u;
+            }
+
             inline void set_managed(bool m) {
                 this->managed = m;
             }
@@ -50,20 +54,34 @@ namespace util {
                 return this->position;
             }
 
+            inline size_t get_last_byte_position(void) const {
+                return util::round_to_byte(this->position);
+            }
+
             inline void reset(void) {
                 this->set_position(0);
             }
 
             /**
-             * Deallocate the buffer and reset all fields
+             *  @brief  Resize the internal buffer if needed.
+             *          Default resize is by 50% increase.
+             *  @param  new_size
+             *      The new size for the buffer.
+             *  @return Returns the size after resizing.
              */
-            void clear(void) {
-                if (this->buffer != nullptr) {
-                    util::deallocArray(this->buffer);
+            size_t resize(size_t new_size=0u) {
+                if (this->managed /*&& this->malloc*/) {
+                    if (new_size == 0) {
+                        // Resize by 50%
+                        new_size = this->size + this->size / 2u;
+                    } else if (new_size <= this->get_size()) {
+                        return this->get_size();
+                    }
+
+                    util::reallocArray(this->buffer, this->size, new_size);
                 }
 
-                this->position = 0;
-                this->size = 0;
+                return this->get_size();
             }
     };
 
@@ -150,7 +168,6 @@ namespace util {
              * Byte-align: Move the bitwise position pointer to the next byte boundary
              */
             void flush();
-
     };
 
     /**
@@ -158,7 +175,6 @@ namespace util {
      */
     void write(FILE *f, const BitStreamWriter &b);
     void write(std::ofstream &fs, const BitStreamWriter &b);
-
 }
 #endif /* UTIL_BITSTREAM_H */
 

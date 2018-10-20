@@ -72,10 +72,18 @@ bool dc::Encoder::process(void) {
                                              float(output_length) / 8.f));
 
     output_length += this->blocks->size() * this->blocks->front()->streamSize();
-    output_length += (8 - (output_length % 8u)) % 8u;         // Padding to next whole byte
-    output_length /= 8u;
+    #ifndef ENABLE_HUFFMAN
+        output_length++;    // Add one bit to signal Huffman is not enabled.
+    #endif
+
+    output_length = util::round_to_byte(output_length);     // Padding to next whole byte
+
 
     this->writer = util::allocVar<util::BitStreamWriter>(output_length);
+
+    #ifndef ENABLE_HUFFMAN
+        this->writer->put_bit(0); // '0': No Huffman sequence present.
+    #endif
 
     // Write matrix data first
     this->quant_m.write(*this->writer);
@@ -85,11 +93,13 @@ bool dc::Encoder::process(void) {
     this->writer->put(dc::ImageProcessor::DIM_BITS, this->width);
     this->writer->put(dc::ImageProcessor::DIM_BITS, this->height);
 
+    const size_t block_count = this->blocks->size();
+    size_t blockid = 0u;
+
     util::Logger::WriteLn("[Encoder] Processing Blocks...");
+    util::Logger::WriteProgress(0, block_count);
 
     #ifdef LOG_LOCAL
-        size_t blockid = 0u;
-
         for (Block<>* b : *this->blocks) {
             util::Logger::WriteLn(std::string_format("Block % 3d:", blockid++));
             b->printExpanded();
@@ -108,11 +118,55 @@ bool dc::Encoder::process(void) {
             util::Logger::WriteLn("", false);
         }
     #else
-        for (Block<>* b : *this->blocks) {
-            b->processDCTDivQ(this->quant_m.getData());
-            b->createRLESequence();
-            b->streamEncoded(*this->writer, this->use_rle);
+        #ifdef ENABLE_OPENMP
+            #pragma omp parallel for shared(blockid) schedule(dynamic)
+            for (auto it = this->blocks->begin(); it < this->blocks->end(); it++) {
+                Block<> *b = *it;
+                b->processDCTDivQ(this->quant_m.getData());
+                b->createRLESequence();
+
+                #pragma omp atomic
+                ++blockid;
+
+                #pragma omp critical
+                util::Logger::WriteProgress(blockid, block_count);
+            }
+
+            // Writing results must happen in sequence
+            for (Block<>* b : *this->blocks) {
+                b->streamEncoded(*this->writer, this->use_rle);
+            }
+        #else
+            for (Block<>* b : *this->blocks) {
+                b->processDCTDivQ(this->quant_m.getData());
+                b->createRLESequence();
+                b->streamEncoded(*this->writer, this->use_rle);
+                util::Logger::WriteProgress(++blockid, block_count);
+            }
+        #endif
+    #endif
+
+    util::Logger::WriteLn("", false);
+
+    #ifdef ENABLE_HUFFMAN
+        util::BitStreamReader hm_input(this->writer->get_buffer(),
+                                       this->writer->get_last_byte_position());
+
+        algo::Huffman<> hm;
+        util::BitStreamWriter *hm_output = hm.encode(hm_input);
+
+        #ifdef LOG_LOCAL
+            util::Logger::WriteLn("\n", false);
+            hm.printDict();
+            util::Logger::WriteLn("\n", false);
+        #endif
+
+        if (hm_output != nullptr) {
+            util::deallocVar(this->writer);
+            this->writer = hm_output;
         }
+
+        util::Logger::WriteLn("", false);
     #endif
 
     return success;
@@ -122,24 +176,5 @@ bool dc::Encoder::process(void) {
  *  @brief  Save the resulting stream to the destination.
  */
 void dc::Encoder::saveResult(void) const {
-
-    util::Logger::WriteLn("\n", false);
-
-    util::Logger::WriteLn("[Encoder] Huffman:");
-    algo::Huffman<> h;
-
-    this->writer->flush();
-    util::BitStreamReader h_input(this->writer->get_buffer(), this->writer->get_position() / 8u);
-
-    util::BitStreamWriter* h_stream = h.encode(h_input);
-
-    #ifdef LOG_LOCAL
-        h.printDict();
-    #endif
-
-    delete h_stream;
-
-    util::Logger::WriteLn("\n", false);
-
     ImageProcessor::saveResult(true);
 }

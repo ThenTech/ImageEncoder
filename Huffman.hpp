@@ -2,6 +2,7 @@
 #define HUFFMAN_HPP
 
 #include "BitStream.hpp"
+#include "Logger.hpp"
 
 #include <cstdint>
 #include <unordered_map>
@@ -15,10 +16,10 @@ namespace algo {
     template<class T=uint8_t>
     class Node {
         public:
-            const T  data;
-            size_t   freq;
-            Node    *left;
-            Node    *right;
+            const T       data;     ///< The actual data in this node.
+            const size_t  freq;     ///< The frequency at which this data occured.
+            Node         *left;     ///< A reference to child on the left ('0')
+            Node         *right;    ///< A reference to child on the right ('1')
 
             /**
              *  @brief  Default ctor
@@ -39,6 +40,24 @@ namespace algo {
             }
 
             /**
+             *  @brief  Default dtor
+             *          Deleting children will implicitly delete entire tree
+             *          by recursive dtor calls on every Node.
+             */
+            ~Node(void) {
+                util::deallocVar(left);
+                util::deallocVar(right);
+            }
+
+            /**
+             *  @brief  Returns true if this Node has no children,
+             *          and therefor is a leaf.
+             */
+            inline bool isLeaf(void) const {
+                return this->left == nullptr && this->right == nullptr;
+            }
+
+            /**
              *  @brief  Comparison operator.
              *          Nodes with lower frequency has a higher priority.
              *
@@ -53,6 +72,27 @@ namespace algo {
                     return first->freq > second->freq;
                 }
             };
+
+            /**
+             *  @brief  Print a tree structure starting from the given Node.
+             *  @param  node
+             *      The Node to start from.
+             *  @param  s
+             *      A string representation of the tree path ('0' for left and '1' for right)
+             */
+            static void printTree(const algo::Node<> * const node, std::string s = "") {
+                if (node == nullptr) {
+                    return;
+                }
+
+                if (node->left == nullptr && node->right == nullptr) {
+                    util::Logger::WriteLn(s + std::string_format(" => %X", node->data), false);
+                    return;
+                }
+
+                printTree(node->left , s + "0");
+                printTree(node->right, s + "1");
+            }
     };
 
     /**
@@ -73,26 +113,28 @@ namespace algo {
 
             std::unordered_map<T, Codeword> dict;
 
-            void add_huffman_dict_header(uint32_t, uint32_t, util::BitStreamWriter&);
-            bool read_huffman_dict_header(util::BitStreamReader&, uint32_t&, uint32_t&);
+            static void add_huffman_dict_header(uint32_t, uint32_t, util::BitStreamWriter&);
+            static bool read_huffman_dict_header(util::BitStreamReader&, uint32_t&, uint32_t&);
 
             void buildDict(const algo::Node<> * const, std::vector<bool>);
-            void decode(const algo::Node<> * const, util::BitStreamReader&, util::BitStreamWriter&);
+            void buildTree(util::BitStreamReader&);
+            void treeAddLeaf(const std::pair<T, Codeword>&);
+
+            void decode(util::BitStreamReader&, util::BitStreamWriter&);
 
             void deleteTree(algo::Node<>*);
+
         public:
             Huffman(void);
             ~Huffman(void);
 
-            void readDictFromStream(util::BitStreamReader&);
-
             util::BitStreamWriter* encode(util::BitStreamReader&);
-            util::BitStreamWriter* decode(util::BitStreamReader&);
+            util::BitStreamReader* decode(util::BitStreamReader&);
 
             void printDict(void);
             void printTree(void);
 
-            static constexpr size_t KEY_BITS  = util::size_of<T>(); ///< Bit length for keys in Huffman dict
+            static constexpr size_t KEY_BITS = util::size_of<T>();  ///< Bit length for keys in Huffman dict
 
             static constexpr size_t DICT_HDR_HAS_ITEMS_BITS  = 1u;  ///< Whether there are dictionary items following (bit length)
             static constexpr size_t DICT_HDR_SEQ_LENGTH_BITS = 7u;  ///< Amunt of bits to represent the length of following items

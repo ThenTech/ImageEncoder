@@ -24,6 +24,7 @@ namespace util {
             static void Destroy();
             static void Write(const std::string &text, bool timestamp=true);
             static void WriteLn(const std::string &text, bool timestamp=true);
+            static void WriteProgress(const size_t& iteration, const size_t& total);
 
             static const std::string FILL;
             static const std::string EMPTY;

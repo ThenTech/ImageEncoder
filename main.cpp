@@ -48,6 +48,7 @@ int main(int argc, char *argv[]) {
     const std::string encfile = c.getValue(dc::Setting::encfile),
                       decfile = c.getValue(dc::Setting::decfile);
     bool success = true;
+    util::timepoint_t start = util::TimerStart();
 
     #ifdef ENCODER
         dc::MatrixReader<> m;
@@ -76,6 +77,11 @@ int main(int argc, char *argv[]) {
 
         if ((success = enc.process())) {
             enc.saveResult();
+
+            util::Logger::WriteLn("", false);
+            util::Logger::WriteLn(std::string_format("Elapsed time: %f milliseconds",
+                                                     util::TimerDuration_ms(start)));
+            util::Logger::WriteLn("", false);
             util::Logger::WriteLn("", false);
         } else {
             util::Logger::WriteLn("Error processing raw image for encoding! See log for details.");
@@ -84,10 +90,16 @@ int main(int argc, char *argv[]) {
 
     #ifdef DECODER
         if (success) {
+            start = util::TimerStart();
             dc::Decoder dec(encfile, decfile);
 
             if (dec.process()) {
                 dec.saveResult();
+
+                util::Logger::WriteLn("", false);
+                util::Logger::WriteLn(std::string_format("Elapsed time: %f milliseconds",
+                                                         util::TimerDuration_ms(start)));
+                util::Logger::WriteLn("", false);
             } else {
                 util::Logger::Write("Error processing raw image for decoding! See log for details.");
             }

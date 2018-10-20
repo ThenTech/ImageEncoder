@@ -34,7 +34,7 @@ namespace dc {
     class ImageProcessor : protected ImageBase {
         protected:
             bool use_rle;                   ///< Whether to use Run Length Encoding.
-            const MatrixReader<> quant_m;   ///< A quantization matrix instance.
+            MatrixReader<> quant_m;   ///< A quantization matrix instance.
 
             const std::string     &dest_file; ///< The path to the destination file.
             std::vector<Block<>*> *blocks;  ///< A list of every Block for the image.
@@ -57,8 +57,8 @@ namespace dc {
             virtual bool process(void)=0;
             virtual void saveResult(void) const {}
 
-            static constexpr size_t RLE_BITS = 1;   ///< The amount of bits to use to represent zhether to use RLE or not.
-            static constexpr size_t DIM_BITS = 15;  ///< The amount of bits to use to represent the image dimensions (width or height).
+            static constexpr size_t RLE_BITS = 1u;   ///< The amount of bits to use to represent zhether to use RLE or not.
+            static constexpr size_t DIM_BITS = 15u;  ///< The amount of bits to use to represent the image dimensions (width or height).
     };
 }
 

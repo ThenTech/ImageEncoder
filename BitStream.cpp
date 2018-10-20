@@ -8,17 +8,23 @@ namespace util {
     BitStreamReader::~BitStreamReader() {}
 
     void BitStreamReader::flush() {
-        if (this->position % 8 != 0) {
-            this->position += 8 - (this->position % 8);
-        }
+        this->position = this->get_last_byte_position();
     }
 
     uint8_t BitStreamReader::get_bit() {
-        const size_t bits_taken = this->position % 8;
-        uint8_t value = this->buffer[this->position / 8];
-        value &= (1 << (7 - bits_taken));
+        const size_t current_start_byte = this->position / 8u;
+
+        if (current_start_byte >= this->get_size()) {
+            // Prevent reading byte outside of array (-> Valgrind flagged)
+            return 0u;
+        }
+
+        const size_t  bits_taken = this->position % 8;
+        const uint8_t value      = this->buffer[current_start_byte];
+
         this->position++;
-        return value != 0;
+
+        return (value & (1 << (7 - bits_taken))) != 0;
     }
 
     uint32_t BitStreamReader::get(size_t l) {

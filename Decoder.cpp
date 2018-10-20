@@ -16,7 +16,7 @@ dc::Decoder::Decoder(const std::string &source_file, const std::string &dest_fil
     : ImageProcessor(source_file, dest_file)
 {
     // Decoding info like (this->quant_m, this->use_rle, width, height)
-    // is gathered in the ImageProcessor ctor.
+    // is gathered in the ImageProcessor ctor after Huffman decompress.
 
     // Verify settings
     assert(this->width  % dc::BlockSize == 0);
@@ -26,9 +26,9 @@ dc::Decoder::Decoder(const std::string &source_file, const std::string &dest_fil
     const float hdrlen = float(this->reader->get_position()) / 8.0f;
     const float datlen = float(this->reader->get_size()) - hdrlen;
 
-    util::Logger::WriteLn(std::string_format("[Decoder] Loaded image with "
+    util::Logger::WriteLn(std::string_format("[Decoder] Loaded %dx%d image with "
                                              "%.1f bytes header and %.1f bytes data.",
-                                             hdrlen, datlen));
+                                             this->width, this->height, hdrlen, datlen));
 
     // Create the output buffer
     this->writer = util::allocVar<util::BitStreamWriter>(this->width * this->height);
@@ -59,7 +59,11 @@ bool dc::Decoder::process(void) {
 
     success = ImageProcessor::process(this->writer->get_buffer());
 
+    const size_t block_count = this->blocks->size();
+    size_t blockid = 0u;
+
     util::Logger::WriteLn("[Decoder] Processing Blocks...");
+    util::Logger::WriteProgress(0, block_count);
 
     #ifdef LOG_LOCAL
         size_t blockid = 0u;
@@ -83,15 +87,38 @@ bool dc::Decoder::process(void) {
             util::Logger::WriteLn("", false);
         }
     #else
-        for (Block<>* b : *this->blocks) {
-            b->loadFromStream(*this->reader, this->use_rle);
-            b->processIDCTMulQ(this->quant_m.getData());
-            b->expand();
-        }
+        #ifdef ENABLE_OPENMP
+            // Reading raw must happen in sequence
+            for (Block<>* b : *this->blocks) {
+                b->loadFromStream(*this->reader, this->use_rle);
+            }
+
+            #pragma omp parallel for shared(blockid) schedule(dynamic)
+            for (auto it = this->blocks->begin(); it < this->blocks->end(); it++) {
+                Block<> *b = *it;
+                b->processIDCTMulQ(this->quant_m.getData());
+                b->expand();
+
+                #pragma omp atomic
+                ++blockid;
+
+                #pragma omp critical
+                util::Logger::WriteProgress(blockid, block_count);
+            }
+        #else
+            for (Block<>* b : *this->blocks) {
+                b->loadFromStream(*this->reader, this->use_rle);
+                b->processIDCTMulQ(this->quant_m.getData());
+                b->expand();
+                util::Logger::WriteProgress(++blockid, block_count);
+            }
+        #endif
     #endif
 
+    util::Logger::WriteLn("", false);
+
     // Buffer is written implicitly
-    this->writer->set_position(this->writer->get_size() * 8u);
+    this->writer->set_position(this->writer->get_size_bits());
 
     return success;
 }

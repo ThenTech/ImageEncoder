@@ -7,17 +7,25 @@ ENCODER_DEF = -DENCODER
 DECODER_TGT = decoder
 DECODER_DEF = -DDECODER
 
+# Extra options for encoder compilation
+# -DENABLE_HUFFMAN : Enable additional Huffman compression step
+# -DENABLE_OPENMP  : Enable Block parallelisation with OpenMP
+ECFLAGS = -DENABLE_HUFFMAN
+
 # Output folder for binaries
 OUTPUT = ./bin
 
 # Link libs such as: -pthread -lm
-LIBS =
+LIBS = -fopenmp
 
 # Use a g++ executable with c++17 support (see install_g++.sh)
 CC = g++-7
 
 # Extra flags to strip unused symbols: -Wl,--strip-all,--gc-sections -fdata-sections -ffunction-sections
-CFLAGS = -std=c++17 -Wall -O3 -Wl,--strip-all,--gc-sections -fdata-sections -ffunction-sections
+# Debug
+#CFLAGS = $(ECFLAGS) -std=c++17 -Wall -Og -fopenmp
+# Release
+CFLAGS = $(ECFLAGS) -std=c++17 -Wall -O3 -Wl,--strip-all,--gc-sections -fdata-sections -ffunction-sections -fopenmp
 
 # Default target
 TARGET   = $(TG_ENCODER)
