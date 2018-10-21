@@ -140,9 +140,6 @@ namespace algo {
             static constexpr size_t DICT_HDR_SEQ_LENGTH_BITS = 7u;  ///< Amunt of bits to represent the length of following items
             static constexpr size_t DICT_HDR_ITEM_BITS       = 4u;  ///< Amunt of bits to represent the length of following items
     };
-
-    extern template class Node<uint8_t>;
-    extern template class Huffman<uint8_t>;
 }
 
 #endif // HUFFMAN_HPP

@@ -418,6 +418,7 @@ void dc::Block<size>::CreateZigZagLUT(void) {
 }
 
 /**
+ *  Template specification.
  *  Specify the template class to use dc::BlockSize as default <size>.
  */
 template class dc::Block<dc::BlockSize>;

@@ -66,8 +66,6 @@ bool dc::Decoder::process(void) {
     util::Logger::WriteProgress(0, block_count);
 
     #ifdef LOG_LOCAL
-        size_t blockid = 0u;
-
         for (Block<>* b : *this->blocks) {
             util::Logger::WriteLn(std::string_format("Block % 3d:", blockid++));
 

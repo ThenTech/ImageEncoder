@@ -231,7 +231,7 @@ algo::Huffman<T>::~Huffman(void) {
  */
 template<class T>
 util::BitStreamWriter* algo::Huffman<T>::encode(util::BitStreamReader& reader) {    
-    const size_t length = reader.get_size() * 8u;
+    const size_t length = reader.get_size_bits();
 
     // Calculate frequencies
     std::unordered_map<T, uint32_t> freqs;
@@ -355,7 +355,7 @@ template<class T>
 util::BitStreamReader* algo::Huffman<T>::decode(util::BitStreamReader& reader) {
     this->buildTree(reader);
 
-    const size_t raw_bits   = (reader.get_size() * 8u);
+    const size_t raw_bits   = reader.get_size_bits();
           size_t data_bits  = raw_bits - reader.get_position();
     const size_t data_bytes = util::round_to_byte(data_bits);
 
@@ -417,5 +417,9 @@ void algo::Huffman<T>::printTree(void) {
     algo::Node<>::printTree(this->tree_root);
 }
 
+/**
+ *  Template specification.
+ *  Specify the template class to use uint8_t as default Type.
+ */
 template class algo::Node<uint8_t>;
 template class algo::Huffman<uint8_t>;

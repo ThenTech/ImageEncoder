@@ -158,6 +158,8 @@ bool dc::Encoder::process(void) {
         #ifdef LOG_LOCAL
             util::Logger::WriteLn("\n", false);
             hm.printDict();
+//            util::Logger::WriteLn("\n", false);
+//            hm.printTree();
             util::Logger::WriteLn("\n", false);
         #endif
 
