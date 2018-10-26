@@ -50,6 +50,8 @@ namespace dc {
             static void CreateZigZagLUT(void);
             static constexpr size_t SIZE_LEN_BITS = 4;  ///< The amount of bits to use to represent the bit length of values insode the Block.
     };
+
+    extern template class dc::Block<dc::BlockSize>;
 }
 
 #endif // BLOCK_HPP
