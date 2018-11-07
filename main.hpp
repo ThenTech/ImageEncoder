@@ -38,7 +38,7 @@
 
 /**
  *  Enable OpenMP to parallelise Block operations.
- *  Only available if linked with -fopenmp. 
+ *  Only available if linked with -fopenmp.
  *  Use `-DENABLE_OPENMP` in the makefile to force using it.
  *  (I cannot seem to get it to work with the Qt .qbs file,
  *   but the makefile will set it.)
@@ -47,7 +47,7 @@
 #if defined(ENABLE_OPENMP) && defined(_OPENMP) && _OPENMP >= 201511u
     #include "omp.h"
 #else
-	#undef ENABLE_OPENMP
+    #undef ENABLE_OPENMP
 #endif
 
 //#define LOG_OFF       ///< Force logging off

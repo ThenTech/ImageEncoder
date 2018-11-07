@@ -47,10 +47,18 @@ int main(int argc, char *argv[]) {
 
     const std::string encfile = c.getValue(dc::Setting::encfile),
                       decfile = c.getValue(dc::Setting::decfile);
+
     bool success = true;
     util::timepoint_t start = util::TimerStart();
 
     #ifdef ENCODER
+        const std::string rawfile = c.getValue(dc::Setting::rawfile);
+
+        if (rawfile == encfile) {
+            std::cerr << "Error in settings! Encoded filename must be different from raw filename!" << std::endl;
+            return 3;
+        }
+
         dc::MatrixReader<> m;
 
         if (!m.read(c.getValue(dc::Setting::quantfile))) {
@@ -61,7 +69,6 @@ int main(int argc, char *argv[]) {
         util::Logger::WriteLn("-------------------------", false);
         util::Logger::WriteLn(m.toString(), false);
 
-        const std::string rawfile = c.getValue(dc::Setting::rawfile);
         uint16_t width, height, rle;
 
         try {
@@ -89,6 +96,11 @@ int main(int argc, char *argv[]) {
     #endif
 
     #ifdef DECODER
+        if (encfile == decfile) {
+            std::cerr << "Error in settings! Decoded filename must be different from encoded!" << std::endl;
+            return 3;
+        }
+
         if (success) {
             start = util::TimerStart();
             dc::Decoder dec(encfile, decfile);

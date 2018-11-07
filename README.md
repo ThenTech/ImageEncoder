@@ -124,7 +124,7 @@
 | ex5           | `2160x2160`    | 1241.7ms | 1060.8ms |    1334.7ms |    1046.7ms |    506.1ms |    373.1ms |
 | ex6           | `512x256`      |   38.5ms |   33.8ms |      46.2ms |      35.3ms |     23.9ms |     17.4ms |
 
-*Regular*, *With extra Huffman compression* and *Huffman with OpenMP*
+*Regular*, *With extra Huffman compression* and *Huffman with OpenMP*. All were determined on a machine with an `Intel i7 7700k` CPU with the default turbo boost enabled (3.5 to 4.90 GHz clock speed).
 
 ## Class diagram
 

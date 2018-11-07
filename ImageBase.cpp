@@ -50,7 +50,7 @@ dc::ImageBase::~ImageBase(void) {
  *      The height in pixels for the image.
  *  @param  use_rle
  *      Whether to use Run-Length Encoding.
- *      Currently enabling this wil drop trailing zeroes in an encoded block.
+ *      Currently enabling this will drop trailing zeroes in an encoded block.
  *  @param  quant_m
  *      The quantization matrix to use.
  */
