@@ -11,7 +11,7 @@ namespace dc {
      *          Use Setting::<name> to reauest a setting from a ConfigReader instance
      *          instead of a raw string.
      */
-    enum class Setting : uint8_t {
+    enum class ImageSetting : uint8_t {
         rawfile = 0,
         encfile,
         decfile,
@@ -23,7 +23,23 @@ namespace dc {
         AMOUNT
     };
 
-    const std::string SettingToKey(Setting s);
+    enum class VideoSetting : uint8_t {
+        rawfile = 0,
+        encfile,
+        decfile,
+        rle,
+        quantfile,
+        width,
+        height,
+        logfile,
+        gop,
+        merange,
+        motioncompensation,
+        AMOUNT
+    };
+
+    const std::string SettingToKey(ImageSetting s);
+    const std::string SettingToKey(VideoSetting s);
 
     /**
      *  @brief
@@ -40,11 +56,14 @@ namespace dc {
             ~ConfigReader(void);
 
             bool read(const std::string &fileName);
-            bool getKeyValue(const Setting &key, std::string &value);
-            const std::string getValue(const Setting &key) const;
+            bool getKeyValue(const ImageSetting &key, std::string &value);
+            bool getKeyValue(const VideoSetting &key, std::string &value);
+            const std::string getValue(const ImageSetting &key) const;
+            const std::string getValue(const VideoSetting &key) const;
             const std::string toString(void) const;
             void clear(void);
-            bool verify(void);
+            bool verifyForImage(void);
+            bool verifyForVideo(void);
 
             std::string getErrorDescription(void) const;
     };

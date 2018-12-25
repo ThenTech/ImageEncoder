@@ -1,7 +1,7 @@
 # Target specific options
 # When compiling with "make encoder" or "make decoder",
 # a symbol ENCODER or DECODER will be defined globally
-# to signal the compiler wich target code is expected.
+# to signal the compiler which target code is expected.
 ENCODER_TGT = encoder
 ENCODER_DEF = -DENCODER
 DECODER_TGT = decoder

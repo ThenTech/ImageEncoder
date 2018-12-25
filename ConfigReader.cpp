@@ -15,13 +15,26 @@
  *  @return
  *      A string representation for s.
  */
-const std::string dc::SettingToKey(dc::Setting s) {
+const std::string dc::SettingToKey(dc::ImageSetting s) {
     static const std::string keys[] = {
         "rawfile"  , "encfile", "decfile", "rle",
         "quantfile", "width"  , "height" , "logfile"
     };
 
-    return keys[uint8_t(s)];
+    return keys[util::to_underlying(s)];
+}
+
+const std::string dc::SettingToKey(dc::VideoSetting s) {
+    static const std::string keys[] = {
+        "gop", "merange", "motioncompensation"
+    };
+
+    const uint8_t idx = util::to_underlying(s);
+    const uint8_t off = util::to_underlying(dc::ImageSetting::AMOUNT);
+
+    return idx < off
+            ? dc::SettingToKey(dc::ImageSetting(s))
+            : keys[idx - off];
 }
 
 /**
@@ -109,7 +122,7 @@ bool dc::ConfigReader::read(const std::string &fileName) {
 	return true;
 }
 
-bool dc::ConfigReader::getKeyValue(const Setting &key, std::string &value) {
+bool dc::ConfigReader::getKeyValue(const ImageSetting &key, std::string &value) {
     std::map<std::string, std::string>::const_iterator it;
 
     it = this->m_keyValues.find(dc::SettingToKey(key));
@@ -124,7 +137,28 @@ bool dc::ConfigReader::getKeyValue(const Setting &key, std::string &value) {
 	return true;
 }
 
-const std::string dc::ConfigReader::getValue(const Setting &key) const {
+bool dc::ConfigReader::getKeyValue(const VideoSetting &key, std::string &value) {
+    std::map<std::string, std::string>::const_iterator it;
+
+    it = this->m_keyValues.find(dc::SettingToKey(key));
+
+    if (it == this->m_keyValues.end()) {
+        this->m_errStr = std::string("Key not found: '" + dc::SettingToKey(key) + "'.");
+        return false;
+    }
+
+    value = it->second;
+
+    return true;
+}
+
+const std::string dc::ConfigReader::getValue(const ImageSetting &key) const {
+    auto it = this->m_keyValues.find(dc::SettingToKey(key));
+
+    return it == this->m_keyValues.end() ? "" : it->second;
+}
+
+const std::string dc::ConfigReader::getValue(const VideoSetting &key) const {
     auto it = this->m_keyValues.find(dc::SettingToKey(key));
 
     return it == this->m_keyValues.end() ? "" : it->second;
@@ -134,7 +168,7 @@ const std::string dc::ConfigReader::toString(void) const {
     std::ostringstream oss;
 
     for (const auto& kv : this->m_keyValues) {
-        oss << std::setw(10) << kv.first << " = " << kv.second << std::endl;
+        oss << std::setw(18) << kv.first << " = " << kv.second << std::endl;
     }
 
     return oss.str();
@@ -148,8 +182,8 @@ std::string dc::ConfigReader::getErrorDescription(void) const {
     return this->m_errStr;
 }
 
-bool dc::ConfigReader::verify(void) {
-    const size_t amount = util::to_underlying(dc::Setting::AMOUNT);
+bool dc::ConfigReader::verifyForImage(void) {
+    const size_t amount = util::to_underlying(dc::ImageSetting::AMOUNT);
 
     if (this->m_keyValues.size() != amount) {
         this->m_errStr = std::string("Too many or too few settings in file!");
@@ -159,7 +193,31 @@ bool dc::ConfigReader::verify(void) {
     std::string err, v;
 
     for (size_t s = 0; s < amount; s++) {
-        if (!this->getKeyValue(Setting(s), v)) {
+        if (!this->getKeyValue(dc::ImageSetting(s), v)) {
+            err += this->m_errStr + '\n';
+        }
+    }
+
+    if (err.size() > 0) {
+        this->m_errStr = err;
+        return false;
+    }
+
+    return true;
+}
+
+bool dc::ConfigReader::verifyForVideo(void) {
+    const size_t amount = util::to_underlying(dc::VideoSetting::AMOUNT);
+
+    if (this->m_keyValues.size() != amount) {
+        this->m_errStr = std::string("Too many or too few settings in file!");
+        return false;
+    }
+
+    std::string err, v;
+
+    for (size_t s = 0; s < amount; s++) {
+        if (!this->getKeyValue(dc::VideoSetting(s), v)) {
             err += this->m_errStr + '\n';
         }
     }

@@ -1,4 +1,4 @@
-#include "Encoder.hpp"
+#include "ImageEncoder.hpp"
 #include "main.hpp"
 #include "Logger.hpp"
 #include "utils.hpp"
@@ -18,9 +18,9 @@
  *  @param  use_rle
  *  @param  quant_m
  */
-dc::Encoder::Encoder(const std::string &source_file, const std::string &dest_file,
-                     const uint16_t &width, const uint16_t &height, const bool &use_rle,
-                     MatrixReader<> &quant_m)
+dc::ImageEncoder::ImageEncoder(const std::string &source_file, const std::string &dest_file,
+                               const uint16_t &width, const uint16_t &height, const bool &use_rle,
+                               MatrixReader<> &quant_m)
     : ImageProcessor(source_file, dest_file, width, height, use_rle, quant_m)
 {
     assert(this->width  % dc::BlockSize == 0);
@@ -31,7 +31,7 @@ dc::Encoder::Encoder(const std::string &source_file, const std::string &dest_fil
 /**
  *  @brief  Default dtor
  */
-dc::Encoder::~Encoder(void) {
+dc::ImageEncoder::~ImageEncoder(void) {
     // Empty
 }
 
@@ -49,16 +49,16 @@ dc::Encoder::~Encoder(void) {
  *
  *  @return Returns true on success.
  */
-bool dc::Encoder::process(void) {
+bool dc::ImageEncoder::process(void) {
     bool success = true;
 
-    util::Logger::WriteLn("[Encoder] Processing image...");
+    util::Logger::WriteLn("[ImageEncoder] Processing image...");
 
     // Pre-process image
     success = ImageProcessor::process(this->reader->get_buffer());
 
     // Write setting header
-    util::Logger::WriteLn("[Encoder] Creating settings header...");
+    util::Logger::WriteLn("[ImageEncoder] Creating settings header...");
     size_t output_length;
 
     const uint8_t quant_bit_len = this->quant_m.getMaxBitLength();
@@ -68,7 +68,7 @@ bool dc::Encoder::process(void) {
                   + (quant_bit_len                     // Size of quantmatrix
                      * dc::BlockSize * dc::BlockSize);
 
-    util::Logger::WriteLn(std::string_format("[Encoder] Settings header length: %.1f bytes.",
+    util::Logger::WriteLn(std::string_format("[ImageEncoder] Settings header length: %.1f bytes.",
                                              float(output_length) / 8.f));
 
     output_length += this->blocks->size() * this->blocks->front()->streamSize();
@@ -96,7 +96,7 @@ bool dc::Encoder::process(void) {
     const size_t block_count = this->blocks->size();
     size_t blockid = 0u;
 
-    util::Logger::WriteLn("[Encoder] Processing Blocks...");
+    util::Logger::WriteLn("[ImageEncoder] Processing Blocks...");
     util::Logger::WriteProgress(0, block_count);
 
     #ifdef LOG_LOCAL
@@ -177,6 +177,6 @@ bool dc::Encoder::process(void) {
 /**
  *  @brief  Save the resulting stream to the destination.
  */
-void dc::Encoder::saveResult(void) const {
+void dc::ImageEncoder::saveResult(void) const {
     ImageProcessor::saveResult(true);
 }

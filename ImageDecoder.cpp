@@ -1,4 +1,4 @@
-#include "Decoder.hpp"
+#include "ImageDecoder.hpp"
 #include "main.hpp"
 #include "Logger.hpp"
 
@@ -12,7 +12,7 @@
  *  @param  dest_file
  *      Path to the destination file (path needs to exist, file will be overwritten).
  */
-dc::Decoder::Decoder(const std::string &source_file, const std::string &dest_file)
+dc::ImageDecoder::ImageDecoder(const std::string &source_file, const std::string &dest_file)
     : ImageProcessor(source_file, dest_file)
 {
     // Decoding info like (this->quant_m, this->use_rle, width, height)
@@ -26,7 +26,7 @@ dc::Decoder::Decoder(const std::string &source_file, const std::string &dest_fil
     const float hdrlen = float(this->reader->get_position()) / 8.0f;
     const float datlen = float(this->reader->get_size()) - hdrlen;
 
-    util::Logger::WriteLn(std::string_format("[Decoder] Loaded %dx%d image with "
+    util::Logger::WriteLn(std::string_format("[ImageDecoder] Loaded %dx%d image with "
                                              "%.1f bytes header and %.1f bytes data.",
                                              this->width, this->height, hdrlen, datlen));
 
@@ -37,7 +37,7 @@ dc::Decoder::Decoder(const std::string &source_file, const std::string &dest_fil
 /**
  *  @brief  Default dtor
  */
-dc::Decoder::~Decoder(void) {
+dc::ImageDecoder::~ImageDecoder(void) {
     // Empty
 }
 
@@ -52,17 +52,17 @@ dc::Decoder::~Decoder(void) {
  *
  *  @return Returns true on success.
  */
-bool dc::Decoder::process(void) {
+bool dc::ImageDecoder::process(void) {
     bool success = true;
 
-    util::Logger::WriteLn("[Decoder] Processing image...");
+    util::Logger::WriteLn("[ImageDecoder] Processing image...");
 
     success = ImageProcessor::process(this->writer->get_buffer());
 
     const size_t block_count = this->blocks->size();
     size_t blockid = 0u;
 
-    util::Logger::WriteLn("[Decoder] Processing Blocks...");
+    util::Logger::WriteLn("[ImageDecoder] Processing Blocks...");
     util::Logger::WriteProgress(0, block_count);
 
     #ifdef LOG_LOCAL
@@ -124,6 +124,6 @@ bool dc::Decoder::process(void) {
 /**
  *  @brief  Save the resulting stream to the destination.
  */
-void dc::Decoder::saveResult(void) const {
+void dc::ImageDecoder::saveResult(void) const {
     ImageProcessor::saveResult(false);
 }

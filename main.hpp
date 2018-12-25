@@ -2,9 +2,9 @@
 #define MAIN_HPP
 
 #define AUTHOR  "William Thenaers"
-#define VERSION "0.0.0.7"
+#define VERSION "0.0.1.1"
 
-#if 0  // Disable for proper building with makefile
+#if 1  // Disable for proper building with makefile
     /*
      *  Targets will be set through makefile,
      *  or enforced here.

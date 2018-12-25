@@ -34,7 +34,7 @@ namespace dc {
     class ImageProcessor : protected ImageBase {
         protected:
             bool use_rle;                   ///< Whether to use Run Length Encoding.
-            MatrixReader<> quant_m;   ///< A quantization matrix instance.
+            MatrixReader<> quant_m;         ///< A quantization matrix instance.
 
             const std::string     &dest_file; ///< The path to the destination file.
             std::vector<Block<>*> *blocks;  ///< A list of every Block for the image.
