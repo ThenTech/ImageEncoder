@@ -43,7 +43,7 @@ bool dc::VideoDecoder::process(void) {
     util::Logger::WriteProgress(0, frame_count);
 
     // TODO
-    for (dc::ImageBase* f : *this->frames) {
+    for (dc::Frame* f : *this->frames) {
         f; // TODO
         util::Logger::WriteProgress(++frameid, frame_count);
     }

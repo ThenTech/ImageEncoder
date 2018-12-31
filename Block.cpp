@@ -180,11 +180,11 @@ void dc::Block<size>::createRLESequence(void) {
 template<size_t size>
 size_t dc::Block<size>::streamSize(void) const {
     if (this->rle_Data == nullptr) {
-        return 4u                    // 4 bits for bit length
-             + (size * size * 16u);  // Upper estimate for needed bits
+        return dc::Block<>::SIZE_LEN_BITS   // 4 bits for bit length
+             + (size * size * 16u);         // Upper estimate for needed bits
     } else {
         // Exact prediction if RLE sequence is known
-        return 4u + (size * size * this->rle_Data->front()->data_bits);
+        return dc::Block<>::SIZE_LEN_BITS + (size * size * this->rle_Data->front()->data_bits);
     }
 }
 
@@ -414,7 +414,8 @@ void dc::Block<size>::printMatrix(void) const {
  */
 template<size_t size>
 void dc::Block<size>::CreateZigZagLUT(void) {
-    algo::createZigzagLUT(BlockZigZagLUT, size);
+    if (BlockZigZagLUT.size()== 0)
+        algo::createZigzagLUT(BlockZigZagLUT, size);
 }
 
 /**

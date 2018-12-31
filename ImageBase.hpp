@@ -23,6 +23,7 @@ namespace dc {
             util::BitStreamReader *reader;  ///< A BitStreamReader linked to the raw input stream.
         public:
             ImageBase(const std::string &source_file, const uint16_t &width, const uint16_t &height);
+            ImageBase(uint8_t * const raw, const uint16_t &width, const uint16_t &height);
             ~ImageBase(void);
     };
 
@@ -47,6 +48,11 @@ namespace dc {
                            const uint16_t &width, const uint16_t &height,
                            const bool &use_rle, MatrixReader<> &quant_m);
             ImageProcessor(const std::string &source_file, const std::string &dest_file);
+
+            ImageProcessor(uint8_t * const raw,
+                           const uint16_t &width, const uint16_t &height,
+                           const bool &use_rle, MatrixReader<> &quant_m);
+
             virtual ~ImageProcessor(void);
 
             /**

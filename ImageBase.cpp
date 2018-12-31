@@ -4,6 +4,8 @@
 #include "Block.hpp"
 #include "Huffman.hpp"
 
+static const std::string NO_VALUE("");
+
 /**
  *  @brief  Default ctor
  *
@@ -26,6 +28,25 @@ dc::ImageBase::ImageBase(const std::string &source_file, const uint16_t &width, 
 
     this->reader = util::allocVar<util::BitStreamReader>(this->raw->data(), this->raw->size());
 }
+
+/**
+ *  @brief  Ctor when source stream is known (video).
+ *
+ *  @param  raw
+ *      Pointer to start of image bytes.
+ *  @param  width
+ *      The width in pixels for the image.
+ *  @param  height
+ *      The height in pixels for the image.
+ */
+dc::ImageBase::ImageBase(uint8_t * const raw, const uint16_t &width, const uint16_t &height)
+    : width(width), height(height)
+    , raw(nullptr)
+    , reader(util::allocVar<util::BitStreamReader>(raw, width * height))
+{
+    // Empty
+}
+
 
 /**
  *  @brief  Default dtor
@@ -75,9 +96,9 @@ dc::ImageProcessor::ImageProcessor(const std::string &source_file,
  *      Path to the destination file (path needs to exist, file will be overwritten).
  */
 dc::ImageProcessor::ImageProcessor(const std::string &source_file, const std::string &dest_file)
-    : ImageBase(source_file, 0u, 0u),                            ///< Create stream
-      dest_file(dest_file),
-      blocks(util::allocVar<std::vector<Block<>*>>())
+    : ImageBase(source_file, 0u, 0u)                            ///< Create stream
+    , dest_file(dest_file)
+    , blocks(util::allocVar<std::vector<Block<>*>>())
 {
     // Assume input is encoded image and settings should be determined from the bytestream
 
@@ -105,6 +126,32 @@ dc::ImageProcessor::ImageProcessor(const std::string &source_file, const std::st
     this->use_rle = this->reader->get(dc::ImageProcessor::RLE_BITS);
     this->width   = uint16_t(this->reader->get(dc::ImageProcessor::DIM_BITS));
     this->height  = uint16_t(this->reader->get(dc::ImageProcessor::DIM_BITS));
+}
+
+/**
+ *  @brief  Ctor for video processor Frame.
+ *
+ *  @param  raw
+ *      Pointer to vidio strteam buffer where a frame starts.
+ *  @param  width
+ *      The width in pixels for the image.
+ *  @param  height
+ *      The height in pixels for the image.
+ *  @param  use_rle
+ *      Whether to use Run-Length Encoding.
+ *      Currently enabling this will drop trailing zeroes in an encoded block.
+ *  @param  quant_m
+ *      The quantization matrix to use.
+ */
+dc::ImageProcessor::ImageProcessor(uint8_t * const raw,
+                                   const uint16_t &width, const uint16_t &height,
+                                   const bool &use_rle, MatrixReader<> &quant_m)
+    : ImageBase(raw, width, height)
+    , use_rle(use_rle), quant_m(quant_m)
+    , dest_file(NO_VALUE)
+    , blocks(util::allocVar<std::vector<Block<>*>>())
+{
+    // Empty
 }
 
 /**

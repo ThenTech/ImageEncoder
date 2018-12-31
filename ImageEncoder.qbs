@@ -14,6 +14,8 @@ Project {
             "ConfigReader.cpp",
             "ConfigReader.hpp",
             "Exceptions.hpp",
+            "Frame.cpp",
+            "Frame.hpp",
             "Huffman.cpp",
             "Huffman.hpp",
             "ImageBase.cpp",
