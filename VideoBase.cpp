@@ -23,8 +23,7 @@ dc::VideoBase::VideoBase(const std::string &source_file, const uint16_t &width, 
  *  @brief  Default dtor
  */
 dc::VideoBase::~VideoBase(void) {
-    util::deallocVar(this->raw);
-    util::deallocVar(this->reader);
+    // Empty
 }
 
 dc::VideoProcessor::VideoProcessor(const std::string &source_file, const std::string &dest_file,

@@ -198,7 +198,6 @@ bool dc::ImageProcessor::process(uint8_t * const source_block_buffer) {
     }
 
     // Create zig-zag-pattern LUT
-    util::Logger::WriteLn(std::string_format("[ImageProcessor] Caching zig-zag pattern for blocksize %d...", dc::BlockSize));
     Block<dc::BlockSize>::CreateZigZagLUT();
 
     return true;

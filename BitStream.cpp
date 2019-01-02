@@ -8,7 +8,7 @@ namespace util {
     BitStreamReader::~BitStreamReader() {}
 
     void BitStreamReader::flush() {
-        this->position = this->get_last_byte_position();
+        this->position = this->get_last_byte_position() * 8u;
     }
 
     uint8_t BitStreamReader::get_bit() {

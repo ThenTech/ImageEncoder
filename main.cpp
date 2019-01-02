@@ -84,7 +84,7 @@ int main(int argc, char *argv[]) {
         util::Logger::WriteLn("-------------------------", false);
         util::Logger::WriteLn(m.toString(), false);
 
-        uint16_t width, height, rle, gop, merange, motioncomp;
+        uint16_t width, height, rle, gop, merange;
 
         try {
             width  = util::lexical_cast<uint16_t>(c.getValue(dc::ImageSetting::width).c_str());
@@ -94,7 +94,6 @@ int main(int argc, char *argv[]) {
             if (input_is_video) {
                 gop        = util::lexical_cast<uint16_t>(c.getValue(dc::VideoSetting::gop).c_str());
                 merange    = util::lexical_cast<uint16_t>(c.getValue(dc::VideoSetting::merange).c_str());
-                motioncomp = util::lexical_cast<uint16_t>(c.getValue(dc::VideoSetting::motioncompensation).c_str());
             }
         } catch (Exceptions::CastingException const& e) {
             util::Logger::WriteLn(e.getMessage());
@@ -116,7 +115,7 @@ int main(int argc, char *argv[]) {
                 util::Logger::WriteLn("Error processing raw image for encoding! See log for details.");
             }
         } else if (input_is_video) {
-            dc::VideoEncoder enc(rawfile, encfile, width, height, rle, m, gop, merange, motioncomp);
+            dc::VideoEncoder enc(rawfile, encfile, width, height, rle, m, gop, merange, true);
 
             if ((success = enc.process())) {
                 enc.saveResult();
@@ -155,6 +154,15 @@ int main(int argc, char *argv[]) {
                     util::Logger::Write("Error processing raw image for decoding! See log for details.");
                 }
             } else if (input_is_video) {
+                uint16_t motioncomp;
+
+                try {
+                    motioncomp = util::lexical_cast<uint16_t>(c.getValue(dc::VideoSetting::motioncompensation).c_str());
+                } catch (Exceptions::CastingException const& e) {
+                    util::Logger::WriteLn(e.getMessage());
+                    return 5;
+                }
+
                 dc::VideoDecoder dec(encfile, decfile, motioncomp);
 
                 if (dec.process()) {

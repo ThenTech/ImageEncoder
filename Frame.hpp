@@ -16,9 +16,12 @@ namespace dc {
         public:
             Frame(uint8_t * const raw, const uint16_t& width, const uint16_t& height,
                   const bool &use_rle, MatrixReader<> &quant_m);
+            ~Frame(void);
 
             size_t streamSize(void) const;
             void streamEncoded(util::BitStreamWriter& writer) const;
+
+            void loadFromStream(util::BitStreamReader& reader);
 
             bool process(void);
     };

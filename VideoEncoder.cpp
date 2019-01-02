@@ -81,11 +81,15 @@ bool dc::VideoEncoder::process(void) {
 
     // TODO
     for (dc::Frame* f : *this->frames) {
+        util::Logger::Pause();
+
         f; // TODO
 
         // TODO motion vectors : https://web.stanford.edu/class/ee398a/handouts/lectures/EE398a_MotionEstimation_2012.pdf
-
+        f->process();
         f->streamEncoded(*this->writer);
+
+        util::Logger::Resume();
         util::Logger::WriteProgress(++frameid, frame_count);
     }
 

@@ -22,7 +22,8 @@ dc::VideoDecoder::VideoDecoder(const std::string &source_file,
                                              this->width, this->height, hdrlen, datlen));
 
     // Create the output buffer
-    this->writer = util::allocVar<util::BitStreamWriter>(this->width * this->height);
+    const size_t total_frame_size = this->frame_buffer_size + this->frame_garbage_size;
+    this->writer = util::allocVar<util::BitStreamWriter>(total_frame_size * this->frame_count);
 }
 
 dc::VideoDecoder::~VideoDecoder(void) {
@@ -32,7 +33,7 @@ dc::VideoDecoder::~VideoDecoder(void) {
 bool dc::VideoDecoder::process(void) {
     bool success = true;
 
-    util::Logger::WriteLn("[VideoDecoder] Processing image...");
+    util::Logger::WriteLn("[VideoDecoder] Processing video...");
 
     success = VideoProcessor::process(this->writer->get_buffer());
 
@@ -44,7 +45,14 @@ bool dc::VideoDecoder::process(void) {
 
     // TODO
     for (dc::Frame* f : *this->frames) {
+        util::Logger::Pause();
+
         f; // TODO
+
+        f->loadFromStream(*this->reader);
+        f->streamEncoded(*this->writer);
+
+        util::Logger::Resume();
         util::Logger::WriteProgress(++frameid, frame_count);
     }
 

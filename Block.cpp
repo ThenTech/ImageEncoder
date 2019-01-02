@@ -414,8 +414,10 @@ void dc::Block<size>::printMatrix(void) const {
  */
 template<size_t size>
 void dc::Block<size>::CreateZigZagLUT(void) {
-    if (BlockZigZagLUT.size()== 0)
+    if (BlockZigZagLUT.size() == 0) {
+        util::Logger::WriteLn(std::string_format("[Block] Caching zig-zag pattern for blocksize %d...", dc::BlockSize));
         algo::createZigzagLUT(BlockZigZagLUT, size);
+    }
 }
 
 /**

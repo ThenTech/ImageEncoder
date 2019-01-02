@@ -87,7 +87,7 @@ void util::Logger::Destroy() {
  *      Whether to include a timestamp (in the file only).
  */
 void util::Logger::Write(const std::string &text, bool timestamp) {
-    if (util::Logger::instance.enabled) {
+    if (util::Logger::instance.canLog()) {
         try {
             std::cout << text;
 
@@ -135,6 +135,8 @@ void util::Logger::WriteProgress(const size_t& iteration, const size_t& total) {
     static constexpr size_t LEN = 55u;
     static size_t stepu = 0u;
 
+    if (!util::Logger::instance.canLog()) return;
+
     const bool done = (iteration == total);
 
     if (iteration == 0) {
@@ -155,4 +157,12 @@ void util::Logger::WriteProgress(const size_t& iteration, const size_t& total) {
             std::cout << std::endl;
         }
     }
+}
+
+void util::Logger::Pause(void) {
+    util::Logger::instance.paused = true;
+}
+
+void util::Logger::Resume(void) {
+    util::Logger::instance.paused = false;
 }
