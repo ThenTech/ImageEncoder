@@ -12,13 +12,18 @@ namespace dc {
 
     class Frame : protected ImageProcessor {
         private:
+            const bool is_i_frame;
+            Frame * const reference_frame;
 
         public:
-            Frame(uint8_t * const raw, const uint16_t& width, const uint16_t& height,
-                  const bool &use_rle, MatrixReader<> &quant_m);
+            Frame(uint8_t * const raw, Frame * const reference_frame,
+                  const uint16_t& width, const uint16_t& height,
+                  const bool &use_rle, MatrixReader<> &quant_m, bool i_frame);
             ~Frame(void);
 
+            inline bool isIFrame(void) const { return this->is_i_frame; }
             size_t streamSize(void) const;
+
             void streamEncoded(util::BitStreamWriter& writer) const;
 
             void loadFromStream(util::BitStreamReader& reader);

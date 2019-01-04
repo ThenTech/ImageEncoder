@@ -17,7 +17,7 @@ dc::VideoEncoder::VideoEncoder(const std::string &source_file, const std::string
 }
 
 dc::VideoEncoder::~VideoEncoder(void) {
-    // Empty
+    dc::MacroBlock::DestroyMERLUT();
 }
 
 bool dc::VideoEncoder::process(void) {
@@ -72,6 +72,8 @@ bool dc::VideoEncoder::process(void) {
     this->writer->put(dc::ImageProcessor::DIM_BITS, uint32_t(this->frame_count));
     this->writer->put(dc::ImageProcessor::DIM_BITS, uint32_t(this->gop));
     this->writer->put(dc::ImageProcessor::DIM_BITS, uint32_t(this->merange));
+
+    dc::MacroBlock::CreateMERLUT(this->merange);
 
     const size_t frame_count = this->frames->size();
     size_t frameid = 0u;

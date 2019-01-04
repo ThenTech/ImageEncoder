@@ -150,6 +150,7 @@ dc::ImageProcessor::ImageProcessor(uint8_t * const raw,
     , use_rle(use_rle), quant_m(quant_m)
     , dest_file(NO_VALUE)
     , blocks(util::allocVar<std::vector<Block<>*>>())
+    , macroblocks(util::allocVar<std::vector<MacroBlock*>>())
 {
     // Empty
 }
@@ -159,6 +160,7 @@ dc::ImageProcessor::ImageProcessor(uint8_t * const raw,
  */
 dc::ImageProcessor::~ImageProcessor(void) {
     util::deallocVector(this->blocks);
+    util::deallocVector(this->macroblocks);
     util::deallocVar(this->writer);
 }
 
@@ -194,6 +196,39 @@ bool dc::ImageProcessor::process(uint8_t * const source_block_buffer) {
 
             // Create new block with the found row offsets
             this->blocks->push_back(util::allocVar<dc::Block<>>(block_starts));
+        }
+    }
+
+    // Create zig-zag-pattern LUT
+    Block<dc::BlockSize>::CreateZigZagLUT();
+
+    return true;
+}
+
+bool dc::ImageProcessor::processMacroBlocks(uint8_t * const source_block_buffer) {
+    util::Logger::WriteLn("[ImageProcessor] Creating macro blocks...");
+    uint8_t *block_starts[dc::MacroBlockSize] = { nullptr };
+
+    constexpr size_t block_size = dc::MacroBlockSize * dc::MacroBlockSize;    ///< Total values inside 1 Block
+    const     size_t blockx     = this->width  / dc::MacroBlockSize;     ///< Amount of Blocks on a row
+    const     size_t blocky     = this->height / dc::MacroBlockSize;     ///< Amount of Blocks in a column
+
+    // Reserve space for blocks
+    this->macroblocks->reserve(blockx * blocky);
+
+    // Get only pointers to start of each block row and save to Block in this->blocks
+    for (size_t b_y = 0; b_y < blocky; b_y++) {                     ///< Block y coord
+        for (size_t b_x = 0; b_x < blockx; b_x++) {                 ///< Block x coord
+            for (size_t y = 0; y < dc::MacroBlockSize; y++) {       ///< Row inside block
+                block_starts[y] = (source_block_buffer +            // Buffer start
+                                   (  (b_y * block_size * blockx)   // Block row start
+                                    + (b_x * dc::MacroBlockSize)    // Block column start
+                                    + (y * this->width)             // Row within block
+                                    + (0)));                        // Column withing block
+            }
+
+            // Create new block with the found row offsets
+            this->macroblocks->push_back(util::allocVar<dc::MacroBlock>(block_starts));
         }
     }
 

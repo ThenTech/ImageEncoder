@@ -5,6 +5,7 @@
 #endif
 
 #include "utils.hpp"
+#include "Logger.hpp"
 
 #ifdef _MSC_VER
     // cmath does not seem to exist with MSVC compiler...
@@ -85,6 +86,82 @@ void algo::createZigzagLUT(std::vector<algo::Position_t> &vec, const size_t size
     std::sort(vec.begin(), vec.end(), bubble_positions);
 }
 
+
+static constexpr std::pair<int, int> MER_SIGNS[algo::MER_PATTERN_SIZE] = {
+//    std::tuple<int, int>(0, 0),  // MIDDLE-CENTER  => Already starting position
+    std::pair<int, int>(+1, +0),   // MIDDLE-RIGHT
+    std::pair<int, int>(+1, +1),   // BOTTOM-RIGHT
+    std::pair<int, int>(+0, +1),   // BOTTOM-CENTER
+    std::pair<int, int>(-1, +1),   // BOTTOM-LEFT
+    std::pair<int, int>(-1, +0),   // MIDDLE-LEFT
+    std::pair<int, int>(-1, -1),   //    TOP-LEFT
+    std::pair<int, int>(+0, -1),   //    TOP-CENTER
+    std::pair<int, int>(+1, -1),   //    TOP-RIGHT
+};
+
+/**
+ *  @brief  Create nested pattern for motion estimation look-up.
+ *  @param  pattern
+ *          Target node with pattern start from offset (0, 0).
+ *  @param  merange
+ *          Depth for pattern provided by motion estimation range value:
+ *
+ *          Start pattern:
+ *           *    *    *
+ *
+ *           *    *    *     With middle = (x0, y0) starting from (0, 0)
+ *                           and other points (MER_PATTERN_SIZE) with offsets by half of merange value.
+ *           *    *    *     Starting at merange / 2.
+ *
+ *          Nested patterns are the same with merange / 2 as new starting offset,
+ *          Until merange is 0.
+ */
+static void generate_mer_lut(algo::MER_level_t &pattern, const int32_t merange, const uint8_t depth) {
+    if (merange == 0u) {
+        pattern.points = nullptr;
+    } else {
+        pattern.points = util::allocArray<algo::MER_level_t>(algo::MER_PATTERN_SIZE);
+
+        for (size_t p = 0; p < algo::MER_PATTERN_SIZE; p++) {
+            pattern.points[p].depth = depth;
+            pattern.points[p].x0 = pattern.x0 + int8_t(MER_SIGNS[p].first  * merange);
+            pattern.points[p].y0 = pattern.y0 + int8_t(MER_SIGNS[p].second * merange);
+            generate_mer_lut(pattern.points[p], merange / 2, depth + 1);
+        }
+    }
+}
+
+void algo::createMERLUT(algo::MER_level_t &pattern, const size_t merange) {
+    pattern.depth = 0;
+    pattern.x0    = 0;
+    pattern.y0    = 0;
+    generate_mer_lut(pattern, int32_t(merange / 2), pattern.depth + 1);
+}
+
+void algo::printMERLUT(algo::MER_level_t &pattern) {
+    util::Logger::Write(std::string(pattern.depth, '+'), false);
+    util::Logger::WriteLn(std::string_format("(%d, %d)", pattern.x0, pattern.y0), false);
+
+    if (pattern.points == nullptr) {
+        return;
+    }
+
+    for (int i = 0; i < algo::MER_PATTERN_SIZE; i++) {
+        printMERLUT(pattern.points[i]);
+    }
+}
+
+void algo::destroyMERLUT(MER_level_t &pattern) {
+    if (pattern.points == nullptr) {
+        return;
+    }
+
+    for (int i = 0; i < MER_PATTERN_SIZE; i++) {
+        algo::destroyMERLUT(pattern.points[i]);
+    }
+
+    util::deallocArray(pattern.points);
+}
 
 ////////////////////////////////////////////////////
 ///   RLE

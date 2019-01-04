@@ -25,6 +25,26 @@ namespace algo {
      */
     void createZigzagLUT(std::vector<algo::Position_t>&, const size_t);
 
+    static constexpr uint8_t MER_PATTERN_SIZE = 8u;  ///< Corners and sides on diamond pattern.
+
+    /**
+     *  Motion estimation pattern data struct.
+     */
+    struct MER_level_t {
+        uint8_t depth;
+        int8_t x0;
+        int8_t y0;
+        MER_level_t *points;
+    };
+
+    /**
+     *  Motion estimation pattern function
+     */
+    void createMERLUT(MER_level_t&, const size_t);
+    void printMERLUT(algo::MER_level_t&);
+    void destroyMERLUT(algo::MER_level_t&);
+
+
     /**
      *  RLE data struct
      */

@@ -3,7 +3,6 @@
 #include "Logger.hpp"
 #include "Huffman.hpp"
 
-
 dc::VideoBase::VideoBase(const std::string &source_file, const uint16_t &width, const uint16_t &height)
     : ImageBase(source_file, width, height)
     , frame_buffer_size(width * height)
@@ -100,14 +99,20 @@ bool dc::VideoProcessor::process(uint8_t * const source_frame_buffer) {
 
     const size_t total_frame_size = this->frame_buffer_size + this->frame_garbage_size;
 
+    dc::Frame *reference_frame = nullptr;
+
     for (size_t f_x = 0; f_x < this->frame_count; f_x++) {
         uint8_t * const frame_starts = source_frame_buffer
                                      + f_x * total_frame_size;
-        this->frames->push_back(util::allocVar<dc::Frame>(frame_starts,
-                                                          this->width,
-                                                          this->height,
-                                                          this->use_rle,
-                                                          this->quant_m));
+
+        // Every this.gop frame is an I frame
+        dc::Frame *current_frame = util::allocVar<dc::Frame>(frame_starts , reference_frame,
+                                                             this->width  , this->height,
+                                                             this->use_rle, this->quant_m,
+                                                             this->is_i_frame(f_x));
+
+        this->frames->push_back(current_frame);
+        reference_frame = current_frame;
     }
 
     return true;

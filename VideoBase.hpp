@@ -21,13 +21,15 @@ namespace dc {
             bool use_rle;               ///< Whether to use Run Length Encoding.
             MatrixReader<> quant_m;     ///< A quantization matrix instance.
 
-            uint16_t   gop;             ///<
-            uint16_t   merange;         ///<
+            uint16_t   gop;             ///< Use (gop - 1) P frames for each I frame
+            uint16_t   merange;         ///< MotionEdstimationRange search window size in pixels.
             const bool motioncomp;      ///<
 
             const std::string           &dest_file; ///< The path to the destination file.
             std::vector<dc::Frame*>     *frames;    ///< A list of every Image for the video.
             util::BitStreamWriter       *writer;    ///< The output stream.
+
+            inline bool is_i_frame(size_t idx) const { return idx % this->gop == 0; }
 
             void saveResult(bool) const;
             bool process(uint8_t * const);

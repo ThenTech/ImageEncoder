@@ -38,11 +38,15 @@ namespace dc {
             MatrixReader<> quant_m;         ///< A quantization matrix instance.
 
             const std::string     &dest_file; ///< The path to the destination file.
-            std::vector<Block<>*> *blocks;  ///< A list of every Block for the image.
+
+            std::vector<dc::MicroBlock*> *blocks;       ///< A list of every Block for the image.
+            std::vector<dc::MacroBlock*> *macroblocks;  ///< A list of every MacroBlock for the image.
+
             util::BitStreamWriter *writer;  ///< The output stream.
 
             void saveResult(bool) const;
             bool process(uint8_t * const);
+            bool processMacroBlocks(uint8_t * const);
         public:
             ImageProcessor(const std::string &source_file, const std::string &dest_file,
                            const uint16_t &width, const uint16_t &height,

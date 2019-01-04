@@ -18,6 +18,7 @@
  *  @brief  Lookup table (vector) for zig-zag indices.
  */
 static std::vector<algo::Position_t> BlockZigZagLUT;
+static algo::MER_level_t BlockMERLUT;
 
 
 /**
@@ -420,8 +421,22 @@ void dc::Block<size>::CreateZigZagLUT(void) {
     }
 }
 
+template<size_t size>
+void dc::Block<size>::CreateMERLUT(const uint16_t& merange) {
+    if (BlockMERLUT.points == nullptr) {
+        util::Logger::WriteLn(std::string_format("[MacroBlock] Caching motion estimation patterns for merange %d...", merange));
+        algo::createMERLUT(BlockMERLUT, merange);
+    }
+}
+
+template<size_t size>
+void dc::Block<size>::DestroyMERLUT(void) {
+    algo::destroyMERLUT(BlockMERLUT);
+}
+
 /**
  *  Template specification.
  *  Specify the template class to use dc::BlockSize as default <size>.
  */
 template class dc::Block<dc::BlockSize>;
+template class dc::Block<dc::MacroBlockSize>;

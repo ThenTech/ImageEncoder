@@ -1,11 +1,14 @@
 #include "Frame.hpp"
 #include "Logger.hpp"
 
-dc::Frame::Frame(uint8_t * const raw, const uint16_t& width, const uint16_t& height,
-                 const bool &use_rle, MatrixReader<> &quant_m)
+dc::Frame::Frame(uint8_t * const raw, Frame * const reference_frame,
+                 const uint16_t& width, const uint16_t& height,
+                 const bool &use_rle, MatrixReader<> &quant_m, bool i_frame)
     : ImageProcessor(raw, width, height, use_rle, quant_m)
+    , is_i_frame(i_frame)
+    , reference_frame(reference_frame)
 {
-
+    // Empty
 }
 
 dc::Frame::~Frame(void) {
@@ -13,6 +16,10 @@ dc::Frame::~Frame(void) {
 }
 
 size_t dc::Frame::streamSize(void) const {
+    // Raw/Decoded        : this->width * this->height * 8u;
+    // Encode  isIFrame() : std::reduce(this->blocks, [](const Block<>& b) { return b.streamSize(); }, 0)
+    // Encode !isIFrame() : (this->width * this->height) / (dc::MacroBlockSize * dc::MacroBlockSize) * dc::Frame::VectorBits * 2
+
     return this->width * this->height * 8u;
 }
 
@@ -68,21 +75,35 @@ void dc::Frame::loadFromStream(util::BitStreamReader &reader) {
 }
 
 bool dc::Frame::process(void) {
-    // TODO
+    if (this->isIFrame()) {
+        util::Logger::WriteLn("[IFrame] Creating blocks...");
+        dc::ImageProcessor::process(this->reader->get_buffer());
 
-    util::Logger::WriteLn("[Frame] Creating blocks...");
-    dc::ImageProcessor::process(this->reader->get_buffer());
+        const size_t output_length = util::round_to_byte(this->blocks->size()
+                                                       * this->blocks->front()->streamSize());
 
-    const size_t output_length = util::round_to_byte(this->blocks->size()
-                                                   * this->blocks->front()->streamSize());
+        this->writer = util::allocVar<util::BitStreamWriter>(output_length);
 
-    this->writer = util::allocVar<util::BitStreamWriter>(output_length);
+        util::Logger::WriteLn("[IFrame] Processing Blocks...");
+        for (Block<>* b : *this->blocks) {
+            b->processDCTDivQ(this->quant_m.getData());
+            b->createRLESequence();
+            b->streamEncoded(*this->writer, this->use_rle);
+        }
+    } else {
+        // TODO
+        util::Logger::WriteLn("[PFrame] Creating macro blocks...");
+        dc::ImageProcessor::processMacroBlocks(this->reader->get_buffer());
 
-    util::Logger::WriteLn("[Frame] Processing Blocks...");
-    for (Block<>* b : *this->blocks) {
-        b->processDCTDivQ(this->quant_m.getData());
-        b->createRLESequence();
-        b->streamEncoded(*this->writer, this->use_rle);
+        const size_t output_length = 1; //TODO
+
+        this->writer = util::allocVar<util::BitStreamWriter>(output_length);
+
+        util::Logger::WriteLn("[PFrame] Processing MacroBlocks...");
+        for (MacroBlock* b : *this->macroblocks) {
+            // TODO
+            b;
+        }
     }
 
     return true;
