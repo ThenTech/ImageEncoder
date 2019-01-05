@@ -124,8 +124,8 @@ static void generate_mer_lut(algo::MER_level_t &pattern, const int32_t merange, 
 
         for (size_t p = 0; p < algo::MER_PATTERN_SIZE; p++) {
             pattern.points[p].depth = depth;
-            pattern.points[p].x0 = pattern.x0 + int8_t(MER_SIGNS[p].first  * merange);
-            pattern.points[p].y0 = pattern.y0 + int8_t(MER_SIGNS[p].second * merange);
+            pattern.points[p].x0 = pattern.x0 + int16_t(MER_SIGNS[p].first  * merange);
+            pattern.points[p].y0 = pattern.y0 + int16_t(MER_SIGNS[p].second * merange);
             generate_mer_lut(pattern.points[p], merange / 2, depth + 1);
         }
     }

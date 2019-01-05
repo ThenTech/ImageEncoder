@@ -85,13 +85,12 @@ bool dc::Frame::process(void) {
         this->writer = util::allocVar<util::BitStreamWriter>(output_length);
 
         util::Logger::WriteLn("[IFrame] Processing Blocks...");
-        for (Block<>* b : *this->blocks) {
+        for (MicroBlock* b : *this->blocks) {
             b->processDCTDivQ(this->quant_m.getData());
             b->createRLESequence();
             b->streamEncoded(*this->writer, this->use_rle);
         }
     } else {
-        // TODO
         util::Logger::WriteLn("[PFrame] Creating macro blocks...");
         dc::ImageProcessor::processMacroBlocks(this->reader->get_buffer());
 
@@ -102,9 +101,14 @@ bool dc::Frame::process(void) {
         util::Logger::WriteLn("[PFrame] Processing MacroBlocks...");
         for (MacroBlock* b : *this->macroblocks) {
             // TODO
-            b;
+
+            b->processFindMotionOffset(this->reference_frame);
         }
     }
 
     return true;
+}
+
+dc::MacroBlock* dc::Frame::getBlockAtCoord(int16_t x, int16_t y) const {
+    return dc::ImageProcessor::getBlockAtCoord(x, y);
 }

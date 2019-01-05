@@ -13,6 +13,8 @@ namespace dc {
     static constexpr size_t BlockSize      =  4u;
     static constexpr size_t MacroBlockSize = 16u;
 
+    class Frame;
+
     /**
      *  @brief  The Block class
      *          Represents a block, linked to the reader/writer stream,
@@ -27,8 +29,12 @@ namespace dc {
             uint8_t *matrix[size];
             double   expanded[size * size];
             std::vector<algo::RLE_data_t*> *rle_Data;
+
+            algo::MER_level_t mvec_this;
+            algo::MER_level_t mvec;
         public:
             Block(uint8_t *row_offset_list[]);
+            Block(uint8_t *row_offset_list[], int16_t x, int16_t y);
             ~Block(void);
 
             void expand(void) const;
@@ -40,7 +46,12 @@ namespace dc {
             void createRLESequence(void);
 
             // Macroblocks
-
+            void updateRows(uint8_t *row_offset_list[]);
+            inline const uint8_t* getRow(size_t) const;
+            size_t relativeDifferenceWith(const dc::Block<dc::MacroBlockSize>&);
+            void processFindMotionOffset(dc::Frame * const ref_frame);
+            inline algo::MER_level_t getCoord(void) const;
+            bool isDifferentBlock(const dc::Block<dc::MacroBlockSize>&) const;
 
             size_t streamSize(void) const;
             void streamEncoded(util::BitStreamWriter&, bool) const;

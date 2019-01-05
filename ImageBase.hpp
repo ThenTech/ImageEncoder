@@ -47,6 +47,7 @@ namespace dc {
             void saveResult(bool) const;
             bool process(uint8_t * const);
             bool processMacroBlocks(uint8_t * const);
+
         public:
             ImageProcessor(const std::string &source_file, const std::string &dest_file,
                            const uint16_t &width, const uint16_t &height,
@@ -66,6 +67,8 @@ namespace dc {
              */
             virtual bool process(void)=0;
             virtual void saveResult(void) const {}
+
+            dc::MacroBlock* getBlockAtCoord(int16_t, int16_t) const;
 
             static constexpr size_t RLE_BITS = 1u;   ///< The amount of bits to use to represent zhether to use RLE or not.
             static constexpr size_t DIM_BITS = 15u;  ///< The amount of bits to use to represent the image dimensions (width or height).

@@ -228,7 +228,7 @@ bool dc::ImageProcessor::processMacroBlocks(uint8_t * const source_block_buffer)
             }
 
             // Create new block with the found row offsets
-            this->macroblocks->push_back(util::allocVar<dc::MacroBlock>(block_starts));
+            this->macroblocks->push_back(util::allocVar<dc::MacroBlock>(block_starts, b_x, b_y));
         }
     }
 
@@ -236,6 +236,29 @@ bool dc::ImageProcessor::processMacroBlocks(uint8_t * const source_block_buffer)
     Block<dc::BlockSize>::CreateZigZagLUT();
 
     return true;
+}
+
+dc::MacroBlock* dc::ImageProcessor::getBlockAtCoord(int16_t x, int16_t y) const {
+    uint8_t *block_starts[dc::MacroBlockSize] = { nullptr };
+
+    // Since Blocks only take pointer to their starting column for each row,
+    // no blocks can be made outside of the boundaries.
+    // This could be solved bycreating a duplicate of the reader buffer
+    // but with (this->width + 2 * dc::MacroBlockSize) * (this->height + 2 * dc::MacroBlockSize)
+    // in size, so referencing of coords outside of the normal frame is possible.
+
+    // FIXME For now, just clamp requested coord within frame...
+    const int16_t b_x = std::clamp(x, int16_t(0), int16_t(this->width  - dc::MacroBlockSize));
+    const int16_t b_y = std::clamp(y, int16_t(0), int16_t(this->height - dc::MacroBlockSize));
+
+    for (int16_t y = 0; y < dc::MacroBlockSize; y++) {       ///< Row inside block
+        block_starts[y] = (this->reader->get_buffer() +     // Buffer start
+                           (  ((b_y + y) * this->width)     // Block row start + Row within block
+                            + (b_x)                         // Block column start
+                          ));                               // Column withing block
+    }
+
+    return util::allocVar<dc::MacroBlock>(block_starts, b_x, b_y);
 }
 
 /**

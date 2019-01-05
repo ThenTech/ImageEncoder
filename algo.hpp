@@ -25,6 +25,7 @@ namespace algo {
      */
     void createZigzagLUT(std::vector<algo::Position_t>&, const size_t);
 
+
     static constexpr uint8_t MER_PATTERN_SIZE = 8u;  ///< Corners and sides on diamond pattern.
 
     /**
@@ -32,8 +33,8 @@ namespace algo {
      */
     struct MER_level_t {
         uint8_t depth;
-        int8_t x0;
-        int8_t y0;
+        int16_t x0;
+        int16_t y0;
         MER_level_t *points;
     };
 
@@ -53,6 +54,7 @@ namespace algo {
         uint8_t data_bits;
         int16_t data;
     } RLE_data_t;
+
 
     /**
      *  DCT functions

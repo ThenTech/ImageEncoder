@@ -5,7 +5,10 @@
 
 #include <algorithm>
 #include <functional>
+#include <numeric>
 #include <cmath>
+
+#include "Frame.hpp"
 
 /**
  *  Transform values to [-128, 127] by subtracting 128?
@@ -33,15 +36,36 @@ static algo::MER_level_t BlockMERLUT;
  */
 template<size_t size>
 dc::Block<size>::Block(uint8_t *row_offset_list[])
-    : matrix{nullptr},
-      expanded{0.0},
-      rle_Data(nullptr)
+    : matrix{nullptr}
+    , expanded{0.0}
+    , rle_Data(nullptr)
 {
-    std::copy_n(row_offset_list, size, this->matrix);
+    this->updateRows(row_offset_list);
 
     for (size_t y = 0; y < size; y++) {
         std::copy_n(this->matrix[y], size, &this->expanded[y * size]);
     }
+}
+
+/**
+ *  @brief  Default ctor for Macroblock
+ *
+ *  @param  row_offset_list
+ *      This should be an array of length <size> with pointers to the
+ *      start of each row for a Block inside a byte stream.
+ *
+ *      The values from the stream will be copied row-by-row to an internal
+ *      array of doubles for calculation.
+ */
+template<size_t size>
+dc::Block<size>::Block(uint8_t *row_offset_list[], int16_t x, int16_t y)
+    : matrix{nullptr}
+    , expanded{0.0}
+    , rle_Data(nullptr)
+    , mvec_this{0, x, y, nullptr}
+    , mvec{0, 0, 0, nullptr}
+{
+    this->updateRows(row_offset_list);
 }
 
 /**
@@ -52,6 +76,11 @@ dc::Block<size>::~Block() {
     if (this->rle_Data != nullptr) {
         util::deallocVector(this->rle_Data);
     }
+}
+
+template<size_t size>
+void dc::Block<size>::updateRows(uint8_t *row_offset_list[]) {
+    std::copy_n(row_offset_list, size, this->matrix);
 }
 
 /**
@@ -174,6 +203,141 @@ void dc::Block<size>::createRLESequence(void) {
     info->data_bits = std::max(info->data_bits, util::ffs(uint32_t(info->data)));
 }
 
+template<size_t size>
+const uint8_t* dc::Block<size>::getRow(size_t row) const {
+    return this->matrix[row];
+}
+
+/**
+ *  @brief  Difference between this and other Block.
+ *          Absolute substraction of every pixel, added together,
+ *          so smaller value is less difference.
+ *  @param  other
+ *  @return
+ */
+template<size_t size>
+size_t dc::Block<size>::relativeDifferenceWith(const dc::Block<dc::MacroBlockSize>& other) {
+    size_t diff = 0ull;
+
+    for (size_t y = 0; y < size; y++) {
+        const uint8_t* other_y = other.getRow(y);
+
+        for (size_t x = 0; x < size; x++) {
+            this->expanded[y * size + x] = std::abs(int16_t(this->matrix[y][x]) - int16_t(other_y[x]));
+            diff += size_t(this->expanded[y * size + x]);
+        }
+    }
+
+    return diff;
+}
+
+template<size_t size>
+void dc::Block<size>::processFindMotionOffset(dc::Frame * const ref_frame) {
+    // Store best value in motion vector mvec
+    // mvec_this has block pixel coords
+
+    algo::MER_level_t *lowest_point = &BlockMERLUT;
+    dc::MacroBlock    *lowest_block = ref_frame->getBlockAtCoord(lowest_point->x0, lowest_point->y0);
+    size_t             lowest_diff  = this->relativeDifferenceWith(*lowest_block);
+
+
+    // Find block in ref_frame at coord mvec with lowest diff
+    while (lowest_point->points != nullptr) {
+        // If lowest_point has points, a better point could still be found.
+
+        // Best point found in lowest_point->points
+        algo::MER_level_t *new_lowest_point = nullptr;
+
+        // For each point offset in pattern
+        for (size_t p = 0; p < algo::MER_PATTERN_SIZE; p++) {
+            algo::MER_level_t *current_point = &lowest_point->points[p];
+
+            // Block pixel (x, y) = current block pixel + offset
+            const int16_t pixel_x = current_point->x0 + this->mvec_this.x0;
+            const int16_t pixel_y = current_point->y0 + this->mvec_this.y0;
+
+            // Get MacroBlock at that offset
+            dc::MacroBlock *current_block = ref_frame->getBlockAtCoord(pixel_x, pixel_y);
+
+            // Calculate diff with offset block
+            const size_t current_diff = this->relativeDifferenceWith(*current_block);
+
+            if (current_diff < lowest_diff) {
+                // Block at offset appears better than previously found Block
+                new_lowest_point = current_point;
+            }
+        }
+    }
+
+
+    // Relative offset only, this->mvec_this should be added to this value by the decoder
+    // to get the pixel coordinate back (now in lowest_block->getCoord()).
+    this->mvec.x0 = lowest_point->x0;
+    this->mvec.y0 = lowest_point->y0;
+
+    // Expand diff with lowest_block to this->expanded
+    this->relativeDifferenceWith(*lowest_block);
+    util::deallocVar(lowest_block);
+
+    // -------------------------------------------------------------------------
+
+//    algo::MER_level_t *current_point = &BlockMERLUT;
+//    dc::MacroBlock    *current_block = ref_frame->getBlockAtCoord(current_point->x0, current_point->y0);
+
+//    size_t             lowest_diff   = this->relativeDifferenceWith(*current_block);
+//    algo::MER_level_t *lowest_point  = current_point;
+//    dc::MacroBlock    *lowest_block  = current_block;
+
+
+//    while (current_point->points != nullptr) {
+//        size_t lowest_diff_at_points = lowest_diff;
+//        dc::MacroBlock *offset_block = nullptr;
+
+//        for (size_t p = 0; p < algo::MER_PATTERN_SIZE; p++) {
+//            offset_block = ref_frame->getBlockAtCoord(current_point->points[p].x0,
+//                                                                      current_point->points[p].y0);
+
+//            if (this->isDifferentBlock(*offset_block)) {
+//                // Different coords
+
+//                const size_t diff = this->relativeDifferenceWith(*offset_block);
+
+//                if (diff < lowest_diff_at_points) {
+//                    lowest_diff_at_points = diff;
+//                }
+//            } else {
+//                // Same coords, skip
+//            }
+//        }
+
+//        if (lowest_diff_at_points < lowest_diff) {
+//            lowest_diff  = lowest_diff_at_points;
+//            lowest_point = &current_point->points[p];
+
+//            util::deallocVar(lowest_block);
+//            lowest_block = offset_block;
+//        }
+
+//        current_point = lowest_point;
+//    }
+
+//    // Expand difference between lowest_block and this to this->expanded
+
+//    util::deallocVar(current_block);
+}
+
+template<size_t size>
+algo::MER_level_t dc::Block<size>::getCoord(void) const {
+    return this->mvec_this;
+}
+
+template<size_t size>
+bool dc::Block<size>::isDifferentBlock(const dc::Block<dc::MacroBlockSize>& other) const {
+    const algo::MER_level_t ovev = other.getCoord();
+    return ovev.x0 != this->mvec_this.x0
+        && ovev.y0 != this->mvec_this.y0;
+}
+
 /**
  *  @brief  Give an upper estimate of the required bytes to represent this Block as encoded data.
  *  @return Returns the length for the Block in bits.
@@ -181,11 +345,11 @@ void dc::Block<size>::createRLESequence(void) {
 template<size_t size>
 size_t dc::Block<size>::streamSize(void) const {
     if (this->rle_Data == nullptr) {
-        return dc::Block<>::SIZE_LEN_BITS   // 4 bits for bit length
+        return dc::Block<size>::SIZE_LEN_BITS   // 4 bits for bit length
              + (size * size * 16u);         // Upper estimate for needed bits
     } else {
         // Exact prediction if RLE sequence is known
-        return dc::Block<>::SIZE_LEN_BITS + (size * size * this->rle_Data->front()->data_bits);
+        return dc::Block<size>::SIZE_LEN_BITS + (size * size * this->rle_Data->front()->data_bits);
     }
 }
 
@@ -415,6 +579,8 @@ void dc::Block<size>::printMatrix(void) const {
  */
 template<size_t size>
 void dc::Block<size>::CreateZigZagLUT(void) {
+    // TODO Zigzag for Macroblock?
+
     if (BlockZigZagLUT.size() == 0) {
         util::Logger::WriteLn(std::string_format("[Block] Caching zig-zag pattern for blocksize %d...", dc::BlockSize));
         algo::createZigzagLUT(BlockZigZagLUT, size);

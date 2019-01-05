@@ -3,6 +3,7 @@
 
 #include "BitStream.hpp"
 #include "ImageBase.hpp"
+#include "Block.hpp"
 
 namespace dc {
     /**
@@ -14,6 +15,8 @@ namespace dc {
         private:
             const bool is_i_frame;
             Frame * const reference_frame;
+
+            void processFindMotionOffset(MacroBlock * const b) const;
 
         public:
             Frame(uint8_t * const raw, Frame * const reference_frame,
@@ -27,6 +30,8 @@ namespace dc {
             void streamEncoded(util::BitStreamWriter& writer) const;
 
             void loadFromStream(util::BitStreamReader& reader);
+
+            dc::MacroBlock* getBlockAtCoord(int16_t, int16_t) const;
 
             bool process(void);
     };
