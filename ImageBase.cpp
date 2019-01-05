@@ -228,7 +228,9 @@ bool dc::ImageProcessor::processMacroBlocks(uint8_t * const source_block_buffer)
             }
 
             // Create new block with the found row offsets
-            this->macroblocks->push_back(util::allocVar<dc::MacroBlock>(block_starts, b_x, b_y));
+            this->macroblocks->push_back(util::allocVar<dc::MacroBlock>(block_starts,
+                                                                        b_x * dc::MacroBlockSize,
+                                                                        b_y * dc::MacroBlockSize));
         }
     }
 

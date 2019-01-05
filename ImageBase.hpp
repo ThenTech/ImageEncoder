@@ -37,7 +37,7 @@ namespace dc {
             bool use_rle;                   ///< Whether to use Run Length Encoding.
             MatrixReader<> quant_m;         ///< A quantization matrix instance.
 
-            const std::string     &dest_file; ///< The path to the destination file.
+            const std::string &dest_file;   ///< The path to the destination file.
 
             std::vector<dc::MicroBlock*> *blocks;       ///< A list of every Block for the image.
             std::vector<dc::MacroBlock*> *macroblocks;  ///< A list of every MacroBlock for the image.

@@ -34,6 +34,8 @@ namespace dc {
             dc::MacroBlock* getBlockAtCoord(int16_t, int16_t) const;
 
             bool process(void);
+
+            static uint8_t GOP_BIT_SIZE;
     };
 }
 

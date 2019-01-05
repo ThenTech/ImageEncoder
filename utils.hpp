@@ -262,6 +262,12 @@ namespace util {
         return sizeof(T) * 8u;
     }
 
+    template<class T>
+    [[maybe_unused]] static inline T shift_signed(size_t value, size_t src_bits) {
+        const size_t bit_length = util::size_of<T>() - src_bits;
+        return T(value << bit_length) >> bit_length;
+    }
+
     /**
      *  \brief   Cast enum type to underlining data type.
      *  \param   e

@@ -39,6 +39,8 @@ dc::VideoProcessor::VideoProcessor(const std::string &source_file, const std::st
     // Encode raw
     this->frame_count = this->reader->get_size()
                       / (this->frame_buffer_size + this->frame_garbage_size);
+
+    dc::Frame::GOP_BIT_SIZE = util::bits_needed(-int16_t(this->gop));
 }
 
 dc::VideoProcessor::VideoProcessor(const std::string &source_file, const std::string &dest_file,
@@ -78,6 +80,8 @@ dc::VideoProcessor::VideoProcessor(const std::string &source_file, const std::st
 
     this->gop     = uint16_t(this->reader->get(dc::ImageProcessor::DIM_BITS));
     this->merange = uint16_t(this->reader->get(dc::ImageProcessor::DIM_BITS));
+
+    dc::Frame::GOP_BIT_SIZE = util::bits_needed(-int16_t(this->gop));
 
     // TODO decode
 }

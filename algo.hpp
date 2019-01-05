@@ -26,7 +26,7 @@ namespace algo {
     void createZigzagLUT(std::vector<algo::Position_t>&, const size_t);
 
 
-    static constexpr uint8_t MER_PATTERN_SIZE = 8u;  ///< Corners and sides on diamond pattern.
+    static constexpr uint8_t MER_PATTERN_SIZE = 9u;  ///< Corners and sides on diamond pattern.
 
     /**
      *  Motion estimation pattern data struct.

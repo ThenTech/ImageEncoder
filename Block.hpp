@@ -38,6 +38,7 @@ namespace dc {
             ~Block(void);
 
             void expand(void) const;
+            void expandDifferences(void) const;
 
             // Microblocks
             void processDCTDivQ(const double m[]);
@@ -47,14 +48,20 @@ namespace dc {
 
             // Macroblocks
             void updateRows(uint8_t *row_offset_list[]);
-            inline const uint8_t* getRow(size_t) const;
-            size_t relativeDifferenceWith(const dc::Block<dc::MacroBlockSize>&);
+            inline uint8_t* getRow(size_t) const;
+            size_t relativeAbsDifferenceWith(const dc::Block<dc::MacroBlockSize>&);
+            void expandDifferenceWith(const dc::Block<dc::MacroBlockSize>&);
             void processFindMotionOffset(dc::Frame * const ref_frame);
             inline algo::MER_level_t getCoord(void) const;
-            bool isDifferentBlock(const dc::Block<dc::MacroBlockSize>&) const;
+            inline bool isDifferentCoord(const int16_t&, const int16_t&) const;
+            inline bool isDifferentCoord(const algo::MER_level_t&) const;
+            inline bool isDifferentBlock(const dc::Block<dc::MacroBlockSize>&) const;
+            void expandBlock(dc::Block<size>&) const;
+            void loadFromReferenceStream(util::BitStreamReader&, dc::Frame * const);
 
             size_t streamSize(void) const;
             void streamEncoded(util::BitStreamWriter&, bool) const;
+            void streamMVec(util::BitStreamWriter&) const;
 
             void loadFromStream(util::BitStreamReader&, bool);
 

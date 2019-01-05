@@ -88,7 +88,7 @@ void algo::createZigzagLUT(std::vector<algo::Position_t> &vec, const size_t size
 
 
 static constexpr std::pair<int, int> MER_SIGNS[algo::MER_PATTERN_SIZE] = {
-//    std::tuple<int, int>(0, 0),  // MIDDLE-CENTER  => Already starting position
+    std::pair<int, int>( 0,  0),   // MIDDLE-CENTER  => Already starting position, but also expandable
     std::pair<int, int>(+1, +0),   // MIDDLE-RIGHT
     std::pair<int, int>(+1, +1),   // BOTTOM-RIGHT
     std::pair<int, int>(+0, +1),   // BOTTOM-CENTER
