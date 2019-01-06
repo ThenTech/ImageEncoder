@@ -36,8 +36,12 @@ void dc::Frame::streamEncoded(util::BitStreamWriter& writer) const {
         writer.put(8, this->writer->get_buffer()[byte]);
     }
 
-    writer.put(bits_to_write - 8 * bytes_to_write,
-               this->writer->get_buffer()[bytes_to_write]);
+    const size_t bits_left = bits_to_write - 8 * bytes_to_write;
+
+    if (bits_left) {
+        writer.put(bits_left,
+                   this->writer->get_buffer()[bytes_to_write] >> (8 - bits_left));
+    }
 }
 
 void dc::Frame::loadFromStream(util::BitStreamReader &reader, bool motioncomp) {

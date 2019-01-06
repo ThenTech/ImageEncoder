@@ -291,7 +291,7 @@ void dc::Block<size>::processFindMotionOffset(dc::Frame * const ref_frame) {
         // Best point found in lowest_point->points
         algo::MER_level_t *new_lowest_point = nullptr;
         size_t             new_lowest_diff  = lowest_diff;
-        dc::MacroBlock    *new_lowest_block = lowest_block;
+        dc::MacroBlock    *new_lowest_block = nullptr;
 
         // For each point offset in pattern
         for (size_t p = 0; p < algo::MER_PATTERN_SIZE; p++) {
@@ -306,6 +306,7 @@ void dc::Block<size>::processFindMotionOffset(dc::Frame * const ref_frame) {
 
             if (p > 0 && !this->isDifferentBlock(*current_block)) {
                 // If (clamped) coord is the same as this, skip
+                util::deallocVar(current_block);
                 continue;
             }
 
@@ -314,9 +315,10 @@ void dc::Block<size>::processFindMotionOffset(dc::Frame * const ref_frame) {
 
             if (current_diff <= new_lowest_diff) {
                 // Block at offset appears better than previously found Block
+                util::deallocVar(new_lowest_block);
+
                 new_lowest_point = current_point;
                 new_lowest_diff  = current_diff;
-                util::deallocVar(new_lowest_block);
                 new_lowest_block = current_block;
             } else {
                 util::deallocVar(current_block);
@@ -325,8 +327,11 @@ void dc::Block<size>::processFindMotionOffset(dc::Frame * const ref_frame) {
 
         if (new_lowest_point == nullptr) {
             // No other point had a lower diff than current middle => early exit
+            util::deallocVar(new_lowest_block);
             break;
         } else {
+            util::deallocVar(lowest_block);
+
             lowest_point = new_lowest_point;
             lowest_block = new_lowest_block;
             lowest_diff  = new_lowest_diff;
