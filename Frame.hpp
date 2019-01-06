@@ -29,13 +29,13 @@ namespace dc {
 
             void streamEncoded(util::BitStreamWriter& writer) const;
 
-            void loadFromStream(util::BitStreamReader& reader);
+            void loadFromStream(util::BitStreamReader& reader, bool);
 
             dc::MacroBlock* getBlockAtCoord(int16_t, int16_t) const;
 
             bool process(void);
 
-            static uint8_t GOP_BIT_SIZE;
+            static uint8_t MVEC_BIT_SIZE;
     };
 }
 

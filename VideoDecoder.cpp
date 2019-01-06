@@ -43,13 +43,10 @@ bool dc::VideoDecoder::process(void) {
     util::Logger::WriteLn("[VideoDecoder] Processing Frames...");
     util::Logger::WriteProgress(0, frame_count);
 
-    // TODO
     for (dc::Frame* f : *this->frames) {
         util::Logger::Pause();
 
-        f; // TODO
-
-        f->loadFromStream(*this->reader);
+        f->loadFromStream(*this->reader, this->motioncomp);
         f->streamEncoded(*this->writer);
 
         util::Logger::Resume();

@@ -3,7 +3,7 @@
 
 #include <cassert>
 
-uint8_t dc::Frame::GOP_BIT_SIZE;
+uint8_t dc::Frame::MVEC_BIT_SIZE;
 
 
 dc::Frame::Frame(uint8_t * const raw, Frame * const reference_frame,
@@ -29,8 +29,6 @@ size_t dc::Frame::streamSize(void) const {
 }
 
 void dc::Frame::streamEncoded(util::BitStreamWriter& writer) const {
-    // TODO
-
     const size_t bits_to_write  = this->writer->get_position();
     const size_t bytes_to_write = bits_to_write / 8u;
 
@@ -40,19 +38,9 @@ void dc::Frame::streamEncoded(util::BitStreamWriter& writer) const {
 
     writer.put(bits_to_write - 8 * bytes_to_write,
                this->writer->get_buffer()[bytes_to_write]);
-
-
-//    uint8_t *buf = writer.get_buffer() + writer.get_last_byte_position();
-
-//    // Copy Y data
-//    std::copy_n(this->writer->get_buffer(),
-//                this->writer->get_last_byte_position(),
-//                buf);
-
-//    writer.set_position(writer.get_position() + this->writer->get_position());
 }
 
-void dc::Frame::loadFromStream(util::BitStreamReader &reader) {
+void dc::Frame::loadFromStream(util::BitStreamReader &reader, bool motioncomp) {
     const size_t frame_bytes = this->width * this->height;
     const size_t UV_bytes    = frame_bytes / 2;
     const size_t frame_size  = frame_bytes + UV_bytes;  // 2/3 Y + 1/3 UV data
@@ -85,14 +73,15 @@ void dc::Frame::loadFromStream(util::BitStreamReader &reader) {
         dc::ImageProcessor::process(this->writer->get_buffer());
 
         for (MicroBlock* b : *this->blocks) {
-
-            b->printExpanded();
-
-            b->printMatrix();
-
             b->loadFromStream(reader, this->use_rle);
-            b->processIDCTMulQ(this->quant_m.getData());
-            b->expandDifferences();
+
+            if (motioncomp) {
+                // Decode prediction errors
+                b->processIDCTMulQ(this->quant_m.getData());
+                b->expandDifferences();
+            } else {
+                // Just consume the prediction error compensation iframe
+            }
         }
     }
 
@@ -125,28 +114,20 @@ bool dc::Frame::process(void) {
         // Create Macroblocks that reference current raw frame
         dc::ImageProcessor::processMacroBlocks(this->reader->get_buffer());
 
-        // Out for Macroblocks expanded => target for motion estimation error
-        util::BitStreamWriter *expanded_buffer = util::allocVar<util::BitStreamWriter>(this->reader->get_size());
-
-        // Encode prediction errors as new IFrame
-        dc::Frame block_processor(expanded_buffer->get_buffer(), nullptr,
-                                  this->width, this->height, this->use_rle,
-                                  this->quant_m, true);
-
-        // Create Macroblocks referencing new expanded_buffer
-        block_processor.processMacroBlocks(expanded_buffer->get_buffer());
+        // Also create MicroBlocks to encode expanded motion prediction errors
+        dc::ImageProcessor::process(this->reader->get_buffer());
 
         // Output for all
         const size_t output_length = (this->macroblocks->size()
-                                       * dc::Frame::GOP_BIT_SIZE * 2)   ///< 2 values for mvec for each block
-                                   + (expanded_buffer->get_size())      ///< Size of resulting frame
-                                   ;
+                                       * dc::Frame::MVEC_BIT_SIZE * 2)  ///< 2 values for mvec for each block
+                                   + util::round_to_byte(              ///< Size of resulting predict error iframe
+                                         this->blocks->size()
+                                       * this->blocks->front()->streamSize());
+
         // Final output for PFrame (mvecs + encoded me-error frame)
         this->writer = util::allocVar<util::BitStreamWriter>(output_length);
 
         util::Logger::WriteLn("[PFrame] Processing MacroBlocks...");
-
-        auto target_blocks = block_processor.macroblocks->begin();
 
         for (MacroBlock* b : *this->macroblocks) {
             b->processFindMotionOffset(this->reference_frame);
@@ -155,26 +136,21 @@ bool dc::Frame::process(void) {
             // Actual vector offset = b->mvec + b->mvec_this
             // Prediction error now within b->expanded
 
-            // Encode b->expanded as if it where a new dc::MacroBlockSize * dc::MacroBlockSize image
-            // by writing b->expanded to new buffer and encoding that one as this->blocks
-
-            // Expand b->expanded to the same Microbloks.expanded to allow encoding
-
-            b->expandBlock(**target_blocks);
+            // Expand b->expanded to the same Microbloks->expanded to allow encoding
+            this->copyMacroblockToMatchingMicroblocks(*b);
 
             // Write mvec for each frame to output
             b->streamMVec(*this->writer);
-
-            target_blocks++;
         }
 
-        // Buffer in block_processor now has the expanded values from this->macroblocks
+        // this->blocks[*]->expanded now has the expanded values from this->macroblocks
         // Process them now again as IFrame
-        block_processor.process();
-
-        // Write Prediction error IFrame after mvecs
-        block_processor.streamEncoded(*this->writer);
-        util::deallocVar(expanded_buffer);
+        // + Write Prediction error IFrame after mvecs
+        for (MicroBlock* b : *this->blocks) {
+            b->processDCTDivQ(this->quant_m.getData());
+            b->createRLESequence();
+            b->streamEncoded(*this->writer, this->use_rle);
+        }
     }
 
     return true;

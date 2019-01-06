@@ -263,6 +263,48 @@ dc::MacroBlock* dc::ImageProcessor::getBlockAtCoord(int16_t x, int16_t y) const 
     return util::allocVar<dc::MacroBlock>(block_starts, b_x, b_y);
 }
 
+void dc::ImageProcessor::copyMacroblockToMatchingMicroblocks(dc::MacroBlock& mb) {
+    constexpr size_t mblock_size = dc::MacroBlockSize * dc::MacroBlockSize; ///< Macro px size
+    constexpr size_t  block_size = dc::BlockSize * dc::BlockSize;           ///< Micro px size
+
+    // For 4 micro and 16 macro size, 16 microblocks in macro, or 4x4 grid
+    constexpr size_t micro_per_macro_row = (mblock_size / block_size) / dc::BlockSize;
+
+    const size_t mblockx = this->width  / dc::MacroBlockSize;  ///< Amount of Macro on a row
+    const size_t mblocky = this->height / dc::MacroBlockSize;  ///< Amount of Macro in a column
+
+    const size_t  blockx = this->width  / dc::BlockSize;       ///< Amount of Micro on a row
+    const size_t  blocky = this->height / dc::BlockSize;       ///< Amount of Micro in a column
+
+    const size_t    mb_x = size_t(mb.getCoord().x0) / dc::MacroBlockSize;  ///< Macro x idx
+    const size_t    mb_y = size_t(mb.getCoord().y0) / dc::MacroBlockSize;  ///< Macro y idx
+
+    // Micro at (x, y) = this->blocks[y * blockx + x]
+    // Micro in first col of Macro at (mb_x, mb_y):
+    //      this->blocks[mb_y * mblocky + mb_x]
+
+    for (size_t y = 0; y < micro_per_macro_row; y++) {
+        // For each row of Micros in Macro
+
+        dc::MicroBlock **row_start = this->blocks->data()                      // Buffer start
+                                      + (mb_y * blockx * micro_per_macro_row)  // Start of Micro row at Macro
+                                      + (mb_x * micro_per_macro_row)           // Start of Micro col at Macro
+                                      + (y * blockx + 0);                      // First Micro in Macro row
+
+        for (size_t x = 0; x < micro_per_macro_row; x++) {
+            // For each Micro in Macro row
+            for (size_t row = 0; row < dc::BlockSize; row++) {
+                // Copy the correct 4x4 piece of Macro to Micro, from expanded to expanded
+                std::copy_n(mb.getExpandedRow( y * dc::BlockSize + row ) + x * dc::BlockSize,
+                            dc::BlockSize,
+                            row_start[x]->getExpandedRow(row));
+            }
+        }
+
+    }
+
+}
+
 /**
  *  @brief  Save the writer stream to this->dest_file,
  *          and give some compression stats.

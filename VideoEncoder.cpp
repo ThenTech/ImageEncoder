@@ -7,9 +7,8 @@
 
 dc::VideoEncoder::VideoEncoder(const std::string &source_file, const std::string &dest_file,
                                const uint16_t &width, const uint16_t &height, const bool &use_rle,
-                               MatrixReader<> &m, const uint16_t &gop, const uint16_t &merange,
-                               const bool &motioncomp)
-    : VideoProcessor(source_file, dest_file, width, height, use_rle, m, gop, merange, motioncomp)
+                               MatrixReader<> &m, const uint16_t &gop, const uint16_t &merange)
+    : VideoProcessor(source_file, dest_file, width, height, use_rle, m, gop, merange)
 {
     assert(this->width  % dc::BlockSize == 0);
     assert(this->height % dc::BlockSize == 0);
@@ -25,7 +24,7 @@ bool dc::VideoEncoder::process(void) {
 
     util::Logger::WriteLn("[VideoEncoder] Processing video...");
 
-    // Pre-process image
+    // Pre-process video
     success = VideoProcessor::process(this->reader->get_buffer());
 
     // Write setting header
@@ -81,15 +80,40 @@ bool dc::VideoEncoder::process(void) {
     util::Logger::WriteLn("[VideoEncoder] Processing Frames...");
     util::Logger::WriteProgress(0, frame_count);
 
-    for (dc::Frame* f : *this->frames) {
+    #ifdef ENABLE_OPENMP
         util::Logger::Pause();
 
-        f->process();
-        f->streamEncoded(*this->writer);
+        #pragma omp parallel for shared(frameid) schedule(dynamic)
+        for (auto it = this->frames->begin(); it < this->frames->end(); it++) {
+            dc::Frame *f = *it;
+
+            f->process();
+            f->streamEncoded(*this->writer);
+
+            #pragma omp atomic
+            ++frameid;
+
+            #pragma omp critical
+            util::Logger::WriteProgress(frameid, frame_count);
+        }
+
+        // Writing results must happen in sequence
+        for (dc::Frame* f : *this->frames) {
+            f->streamEncoded(*this->writer);
+        }
 
         util::Logger::Resume();
-        util::Logger::WriteProgress(++frameid, frame_count);
-    }
+    #else
+        for (dc::Frame* f : *this->frames) {
+            util::Logger::Pause();
+
+            f->process();
+            f->streamEncoded(*this->writer);
+
+            util::Logger::Resume();
+            util::Logger::WriteProgress(++frameid, frame_count);
+        }
+    #endif
 
     util::Logger::WriteLn("", false);
 

@@ -115,7 +115,7 @@ int main(int argc, char *argv[]) {
                 util::Logger::WriteLn("Error processing raw image for encoding! See log for details.");
             }
         } else if (input_is_video) {
-            dc::VideoEncoder enc(rawfile, encfile, width, height, rle, m, gop, merange, true);
+            dc::VideoEncoder enc(rawfile, encfile, width, height, rle, m, gop, merange);
 
             if ((success = enc.process())) {
                 enc.saveResult();

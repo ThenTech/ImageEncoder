@@ -49,6 +49,7 @@ namespace dc {
             // Macroblocks
             void updateRows(uint8_t *row_offset_list[]);
             inline uint8_t* getRow(size_t) const;
+            inline double* getExpandedRow(size_t);
             size_t relativeAbsDifferenceWith(const dc::Block<dc::MacroBlockSize>&);
             void expandDifferenceWith(const dc::Block<dc::MacroBlockSize>&);
             void processFindMotionOffset(dc::Frame * const ref_frame);
@@ -56,7 +57,7 @@ namespace dc {
             inline bool isDifferentCoord(const int16_t&, const int16_t&) const;
             inline bool isDifferentCoord(const algo::MER_level_t&) const;
             inline bool isDifferentBlock(const dc::Block<dc::MacroBlockSize>&) const;
-            void expandBlock(dc::Block<size>&) const;
+            void copyBlockMatrixTo(dc::Block<size>&) const;
             void loadFromReferenceStream(util::BitStreamReader&, dc::Frame * const);
 
             size_t streamSize(void) const;

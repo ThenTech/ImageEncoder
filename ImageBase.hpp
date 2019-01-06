@@ -48,6 +48,8 @@ namespace dc {
             bool process(uint8_t * const);
             bool processMacroBlocks(uint8_t * const);
 
+            void copyMacroblockToMatchingMicroblocks(MacroBlock &);
+
         public:
             ImageProcessor(const std::string &source_file, const std::string &dest_file,
                            const uint16_t &width, const uint16_t &height,

@@ -12,8 +12,7 @@ namespace dc {
         public:
             VideoEncoder(const std::string &source_file, const std::string &dest_file,
                          const uint16_t &width, const uint16_t &height, const bool &use_rle,
-                         MatrixReader<> &m, const uint16_t &gop, const uint16_t &merange,
-                         const bool &motioncomp);
+                         MatrixReader<> &m, const uint16_t &gop, const uint16_t &merange);
             ~VideoEncoder(void);
 
             bool process(void);

@@ -28,11 +28,10 @@ dc::VideoBase::~VideoBase(void) {
 dc::VideoProcessor::VideoProcessor(const std::string &source_file, const std::string &dest_file,
                                    const uint16_t &width, const uint16_t &height,
                                    const bool &use_rle, MatrixReader<> &quant_m,
-                                   const uint16_t &gop, const uint16_t &merange,
-                                   const bool &motioncomp)
+                                   const uint16_t &gop, const uint16_t &merange)
     : VideoBase(source_file, width, height)
     , use_rle(use_rle), quant_m(quant_m)
-    , gop(gop), merange(merange), motioncomp(motioncomp)
+    , gop(std::max(uint16_t(1), gop)), merange(merange), motioncomp(true)
     , dest_file(dest_file)
     , frames(util::allocVar<std::vector<dc::Frame*>>())
 {
@@ -40,7 +39,7 @@ dc::VideoProcessor::VideoProcessor(const std::string &source_file, const std::st
     this->frame_count = this->reader->get_size()
                       / (this->frame_buffer_size + this->frame_garbage_size);
 
-    dc::Frame::GOP_BIT_SIZE = util::bits_needed(-int16_t(this->gop));
+    dc::Frame::MVEC_BIT_SIZE = util::bits_needed(int16_t(this->merange));
 }
 
 dc::VideoProcessor::VideoProcessor(const std::string &source_file, const std::string &dest_file,
@@ -81,7 +80,7 @@ dc::VideoProcessor::VideoProcessor(const std::string &source_file, const std::st
     this->gop     = uint16_t(this->reader->get(dc::ImageProcessor::DIM_BITS));
     this->merange = uint16_t(this->reader->get(dc::ImageProcessor::DIM_BITS));
 
-    dc::Frame::GOP_BIT_SIZE = util::bits_needed(-int16_t(this->gop));
+    dc::Frame::MVEC_BIT_SIZE = util::bits_needed(int16_t(this->merange));
 
     // TODO decode
 }

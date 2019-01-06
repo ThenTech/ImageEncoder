@@ -54,7 +54,7 @@ void util::Logger::Create(const std::string &fileName) {
                 #define DEC_TXT
             #endif
 
-            util::Logger::WriteLn("Simplified JPEG " ENC_TXT DEC_TXT " by " AUTHOR " v" VERSION "\n", false);
+            util::Logger::WriteLn("Simplified JPEG/Video " ENC_TXT DEC_TXT " by " AUTHOR " v" VERSION "\n", false);
             return;
         } catch (std::exception const& e) {
             std::cerr << "[Logger] " << e.what() << std::endl;
@@ -135,7 +135,9 @@ void util::Logger::WriteProgress(const size_t& iteration, const size_t& total) {
     static constexpr size_t LEN = 55u;
     static size_t stepu = 0u;
 
-    if (!util::Logger::instance.canLog()) return;
+    #ifndef ENABLE_OPENMP
+        if (!util::Logger::instance.canLog()) return;
+    #endif
 
     const bool done = (iteration == total);
 

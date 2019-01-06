@@ -37,8 +37,7 @@ namespace dc {
             VideoProcessor(const std::string &source_file, const std::string &dest_file,
                            const uint16_t &width, const uint16_t &height,
                            const bool &use_rle, MatrixReader<> &quant_m,
-                           const uint16_t &gop, const uint16_t &merange,
-                           const bool &motioncomp);
+                           const uint16_t &gop, const uint16_t &merange);
             VideoProcessor(const std::string &source_file, const std::string &dest_file,
                            const bool &motioncomp);
 

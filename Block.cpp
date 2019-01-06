@@ -236,6 +236,11 @@ uint8_t* dc::Block<size>::getRow(size_t row) const {
     return this->matrix[row];
 }
 
+template<size_t size>
+double* dc::Block<size>::getExpandedRow(size_t row) {
+    return &this->expanded[row * size];
+}
+
 /**
  *  @brief  Difference between this and other Block.
  *          Absolute substraction of every pixel, added together,
@@ -439,8 +444,8 @@ void dc::Block<size>::streamMVec(util::BitStreamWriter& writer) const {
     // This is only the relative offset in pixels from the position of this block,
     // So the full vector would be this->mvec_this + this->mvec
 
-    writer.put(dc::Frame::GOP_BIT_SIZE, uint32_t(this->mvec.x0));
-    writer.put(dc::Frame::GOP_BIT_SIZE, uint32_t(this->mvec.y0));
+    writer.put(dc::Frame::MVEC_BIT_SIZE, uint32_t(this->mvec.x0));
+    writer.put(dc::Frame::MVEC_BIT_SIZE, uint32_t(this->mvec.y0));
 }
 
 /**
@@ -500,15 +505,15 @@ void dc::Block<size>::loadFromReferenceStream(util::BitStreamReader& reader, dc:
 template<>
 void dc::Block<dc::MacroBlockSize>::loadFromReferenceStream(util::BitStreamReader& reader, dc::Frame * const ref_frame) {
     // Get motion vector offset from stream
-    this->mvec.x0 = util::shift_signed<int16_t>(reader.get(dc::Frame::GOP_BIT_SIZE), dc::Frame::GOP_BIT_SIZE);
-    this->mvec.y0 = util::shift_signed<int16_t>(reader.get(dc::Frame::GOP_BIT_SIZE), dc::Frame::GOP_BIT_SIZE);
+    this->mvec.x0 = util::shift_signed<int16_t>(reader.get(dc::Frame::MVEC_BIT_SIZE), dc::Frame::MVEC_BIT_SIZE);
+    this->mvec.y0 = util::shift_signed<int16_t>(reader.get(dc::Frame::MVEC_BIT_SIZE), dc::Frame::MVEC_BIT_SIZE);
 
     // Get Macroblock in reference frame at location of motion offset
     dc::MacroBlock *ref_block = ref_frame->getBlockAtCoord(this->mvec.x0 + this->mvec_this.x0,
                                                            this->mvec.y0 + this->mvec_this.y0);
 
     // Copy values from reference block to this
-    ref_block->expandBlock(*this);
+    ref_block->copyBlockMatrixTo(*this);
 
     util::deallocVar(ref_block);
 }
