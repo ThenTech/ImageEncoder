@@ -38,6 +38,20 @@ namespace dc {
         AMOUNT
     };
 
+    static constexpr size_t EXPECTED_VideoEncoderSettings = 8;
+    static const VideoSetting VideoEncoderSettings[] = {
+        VideoSetting::rawfile, VideoSetting::encfile,
+        VideoSetting::rle    , VideoSetting::quantfile,
+        VideoSetting::width  , VideoSetting::height,
+        VideoSetting::gop    , VideoSetting::merange
+    };
+
+    static constexpr size_t EXPECTED_VideoDecoderSettings = 3;
+    static const VideoSetting VideoDecoderSettings[] = {
+        VideoSetting::encfile, VideoSetting::decfile,
+        VideoSetting::motioncompensation
+    };
+
     const std::string SettingToKey(ImageSetting s);
     const std::string SettingToKey(VideoSetting s);
 
@@ -63,7 +77,7 @@ namespace dc {
             const std::string toString(void) const;
             void clear(void);
             bool verifyForImage(void);
-            bool verifyForVideo(void);
+            bool verifyForVideo(bool);
 
             std::string getErrorDescription(void) const;
     };

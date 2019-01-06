@@ -2,7 +2,7 @@
 #define MAIN_HPP
 
 #define AUTHOR  "William Thenaers"
-#define VERSION "0.0.1.3"
+#define VERSION "0.0.1.5"
 
 #if 0  // Disable for proper building with makefile
     /*

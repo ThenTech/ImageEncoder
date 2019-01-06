@@ -34,19 +34,20 @@ int main(int argc, char *argv[]) {
     const bool input_is_image = c.verifyForImage();
     const std::string errstri = c.getErrorDescription();
 
-    const bool input_is_video = c.verifyForVideo();
-    const std::string errstrv = c.getErrorDescription();
+    const bool input_is_encvideo = c.verifyForVideo(true);
+    const std::string errstrev   = c.getErrorDescription();
+    const bool input_is_decvideo = c.verifyForVideo(false);
+    const std::string errstrdv   = c.getErrorDescription();
 
-    bool is_any = false;
-
-    if (input_is_image && !input_is_video) {
-        is_any = true;
-    } else if (input_is_video && !input_is_image) {
-        is_any = true;
+    if (input_is_image && !(input_is_encvideo || input_is_decvideo)) {
+        // pass
+    } else if ((input_is_encvideo || input_is_decvideo) && !input_is_image) {
+        // pass
     } else {
         std::cerr << "Error in settings!" << std::endl;
-        if (errstri.size() > 0) std::cerr << errstri << std::endl;
-        if (errstrv.size() > 0) std::cerr << errstrv << std::endl;
+        if (errstri.size()  > 0) std::cerr << errstri  << std::endl;
+        if (errstrev.size() > 0) std::cerr << errstrev << std::endl;
+        if (errstrdv.size() > 0) std::cerr << errstrdv << std::endl;
         return 3;
     }
 
@@ -91,7 +92,7 @@ int main(int argc, char *argv[]) {
             height = util::lexical_cast<uint16_t>(c.getValue(dc::ImageSetting::height).c_str());
             rle    = util::lexical_cast<uint16_t>(c.getValue(dc::ImageSetting::rle).c_str());
 
-            if (input_is_video) {
+            if (input_is_encvideo) {
                 gop        = util::lexical_cast<uint16_t>(c.getValue(dc::VideoSetting::gop).c_str());
                 merange    = util::lexical_cast<uint16_t>(c.getValue(dc::VideoSetting::merange).c_str());
             }
@@ -114,7 +115,7 @@ int main(int argc, char *argv[]) {
             } else {
                 util::Logger::WriteLn("Error processing raw image for encoding! See log for details.");
             }
-        } else if (input_is_video) {
+        } else if (input_is_encvideo) {
             dc::VideoEncoder enc(rawfile, encfile, width, height, rle, m, gop, merange);
 
             if ((success = enc.process())) {
@@ -153,7 +154,7 @@ int main(int argc, char *argv[]) {
                 } else {
                     util::Logger::Write("Error processing raw image for decoding! See log for details.");
                 }
-            } else if (input_is_video) {
+            } else if (input_is_decvideo) {
                 uint16_t motioncomp;
 
                 try {

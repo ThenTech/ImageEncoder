@@ -186,7 +186,7 @@ bool dc::ConfigReader::verifyForImage(void) {
     const size_t amount = util::to_underlying(dc::ImageSetting::AMOUNT);
 
     if (this->m_keyValues.size() != amount) {
-        this->m_errStr = std::string("Too many or too few settings in file!");
+        this->m_errStr = std::string("Too many or too few settings in file for image en/decoder!");
         return false;
     }
 
@@ -206,19 +206,30 @@ bool dc::ConfigReader::verifyForImage(void) {
     return true;
 }
 
-bool dc::ConfigReader::verifyForVideo(void) {
-    const size_t amount = util::to_underlying(dc::VideoSetting::AMOUNT);
-
-    if (this->m_keyValues.size() != amount) {
-        this->m_errStr = std::string("Too many or too few settings in file!");
-        return false;
-    }
-
+bool dc::ConfigReader::verifyForVideo(bool encoder=true) {
     std::string err, v;
 
-    for (size_t s = 0; s < amount; s++) {
-        if (!this->getKeyValue(dc::VideoSetting(s), v)) {
-            err += this->m_errStr + '\n';
+    if (encoder) {
+        if (this->m_keyValues.size() < dc::EXPECTED_VideoEncoderSettings) {
+            this->m_errStr = std::string("Too many or too few settings in file for video encoder!");
+            return false;
+        }
+
+        for (size_t s = 0; s < dc::EXPECTED_VideoEncoderSettings; s++) {
+            if (!this->getKeyValue(dc::VideoEncoderSettings[s], v)) {
+                err += this->m_errStr + '\n';
+            }
+        }
+    } else {
+        if (this->m_keyValues.size() < dc::EXPECTED_VideoDecoderSettings) {
+            this->m_errStr = std::string("Too many or too few settings in file for video decoder!");
+            return false;
+        }
+
+        for (size_t s = 0; s < dc::EXPECTED_VideoDecoderSettings; s++) {
+            if (!this->getKeyValue(dc::VideoDecoderSettings[s], v)) {
+                err += this->m_errStr + '\n';
+            }
         }
     }
 
