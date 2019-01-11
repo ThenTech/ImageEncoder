@@ -57,11 +57,25 @@ void dc::Frame::loadFromStream(util::BitStreamReader &reader, bool motioncomp) {
         util::Logger::WriteLn("[IFrame] Creating MicroBlocks...");
         dc::ImageProcessor::process(this->writer->get_buffer());
 
-        for (MicroBlock* b : *this->blocks) {
-            b->loadFromStream(reader, this->use_rle);
-            b->processIDCTMulQ(this->quant_m.getData());
-            b->expand();
-        }
+        #ifdef ENABLE_OPENMP
+            // Reading raw must happen in sequence
+            for (MicroBlock* b : *this->blocks) {
+                b->loadFromStream(reader, this->use_rle);
+            }
+
+            #pragma omp parallel for schedule(dynamic)
+            for (auto it = this->blocks->begin(); it < this->blocks->end(); it++) {
+                Block<> *b = *it;
+                b->processIDCTMulQ(this->quant_m.getData());
+                b->expand();
+            }
+        #else
+            for (MicroBlock* b : *this->blocks) {
+                b->loadFromStream(reader, this->use_rle);
+                b->processIDCTMulQ(this->quant_m.getData());
+                b->expand();
+            }
+        #endif
     } else {
         // Frame contains mvecs + iframe with motion error diff
 
@@ -72,21 +86,36 @@ void dc::Frame::loadFromStream(util::BitStreamReader &reader, bool motioncomp) {
             b->loadFromReferenceStream(reader, this->reference_frame);
         }
 
-        // TODO Motion compensation?
         util::Logger::WriteLn("[PFrame] Recreating MicroBlocks (for motion compansation if enabled)...");
         dc::ImageProcessor::process(this->writer->get_buffer());
 
-        for (MicroBlock* b : *this->blocks) {
-            b->loadFromStream(reader, this->use_rle);
+        #ifdef ENABLE_OPENMP
+            // Reading raw must happen in sequence
+            for (MicroBlock* b : *this->blocks) {
+                b->loadFromStream(reader, this->use_rle);
+            }
 
             if (motioncomp) {
-                // Decode prediction errors
-                b->processIDCTMulQ(this->quant_m.getData());
-                b->expandDifferences();
-            } else {
-                // Just consume the prediction error compensation iframe
+                #pragma omp parallel for schedule(dynamic)
+                for (auto it = this->blocks->begin(); it < this->blocks->end(); it++) {
+                    Block<> *b = *it;
+                    b->processIDCTMulQ(this->quant_m.getData());
+                    b->expandDifferences();
+                }
             }
-        }
+        #else
+            for (MicroBlock* b : *this->blocks) {
+                b->loadFromStream(reader, this->use_rle);
+
+                if (motioncomp) {
+                    // Decode prediction errors
+                    b->processIDCTMulQ(this->quant_m.getData());
+                    b->expandDifferences();
+                } else {
+                    // Just consume the prediction error compensation iframe
+                }
+            }
+        #endif
     }
 
     // For expanding to decoded, fill UV data
@@ -108,11 +137,26 @@ bool dc::Frame::process(void) {
         this->writer = util::allocVar<util::BitStreamWriter>(output_length);
 
         util::Logger::WriteLn("[IFrame] Processing MicroBlocks...");
-        for (MicroBlock* b : *this->blocks) {
-            b->processDCTDivQ(this->quant_m.getData());
-            b->createRLESequence();
-            b->streamEncoded(*this->writer, this->use_rle);
-        }
+
+        #ifdef ENABLE_OPENMP
+            #pragma omp parallel for schedule(dynamic)
+            for (auto it = this->blocks->begin(); it < this->blocks->end(); it++) {
+                MicroBlock *b = *it;
+                b->processDCTDivQ(this->quant_m.getData());
+                b->createRLESequence();
+            }
+
+            // Writing results must happen in sequence
+            for (MicroBlock* b : *this->blocks) {
+                b->streamEncoded(*this->writer, this->use_rle);
+            }
+        #else
+            for (MicroBlock* b : *this->blocks) {
+                b->processDCTDivQ(this->quant_m.getData());
+                b->createRLESequence();
+                b->streamEncoded(*this->writer, this->use_rle);
+            }
+        #endif
     } else {
         util::Logger::WriteLn("[PFrame] Creating MacroBlocks...");
         // Create Macroblocks that reference current raw frame
@@ -133,28 +177,70 @@ bool dc::Frame::process(void) {
 
         util::Logger::WriteLn("[PFrame] Processing MacroBlocks...");
 
-        for (MacroBlock* b : *this->macroblocks) {
-            b->processFindMotionOffset(this->reference_frame);
+        #ifdef ENABLE_OPENMP
+            #pragma omp parallel for schedule(dynamic)
+            for (auto it = this->macroblocks->begin(); it < this->macroblocks->end(); it++) {
+                MacroBlock *b = *it;
+                b->processFindMotionOffset(this->reference_frame);
+                this->copyMacroblockToMatchingMicroblocks(*b);
 
-            // Motion vector offset now in b->mvec
-            // Actual vector offset = b->mvec + b->mvec_this
-            // Prediction error now within b->expanded
+                const algo::MER_level_t mvec_coord = b->getCoordAfterMotion();
+                dc::MacroBlock *ref_block = this->reference_frame->getBlockAtCoord(
+                                                mvec_coord.x0, mvec_coord.y0);
+                ref_block->copyBlockMatrixTo(*b);
+                util::deallocVar(ref_block);
+            }
 
-            // Expand b->expanded to the same Microbloks->expanded to allow encoding
-            this->copyMacroblockToMatchingMicroblocks(*b);
+            // Writing results must happen in sequence
+            for (MacroBlock* b : *this->macroblocks) {
+                b->streamMVec(*this->writer);
+            }
 
-            // Write mvec for each frame to output
-            b->streamMVec(*this->writer);
-        }
+            #pragma omp parallel for schedule(dynamic)
+            for (auto it = this->blocks->begin(); it < this->blocks->end(); it++) {
+                MicroBlock *b = *it;
+                b->expandDifferences();
+            }
 
-        // this->blocks[*]->expanded now has the expanded values from this->macroblocks
-        // Process them now again as IFrame
-        // + Write Prediction error IFrame after mvecs
-        for (MicroBlock* b : *this->blocks) {
-            b->processDCTDivQ(this->quant_m.getData());
-            b->createRLESequence();
-            b->streamEncoded(*this->writer, this->use_rle);
-        }
+            // Writing results must happen in sequence
+            for (MicroBlock* b : *this->blocks) {
+                b->streamEncoded(*this->writer, this->use_rle);
+            }
+        #else
+            for (MacroBlock* b : *this->macroblocks) {
+                b->processFindMotionOffset(this->reference_frame);
+
+                // Motion vector offset now in b->mvec
+                // Actual vector offset = b->mvec + b->mvec_this
+                // Prediction error now within b->expanded
+
+                // Expand b->expanded to the same Microbloks->expanded and encode
+                this->copyMacroblockToMatchingMicroblocks(*b);
+
+                // Copy ref_frame MacroBlock to this, for better motion estimation in next frame
+                const algo::MER_level_t mvec_coord = b->getCoordAfterMotion();
+                dc::MacroBlock *ref_block = this->reference_frame->getBlockAtCoord(
+                                                mvec_coord.x0, mvec_coord.y0);
+                ref_block->copyBlockMatrixTo(*b);
+                util::deallocVar(ref_block);
+
+                // Write mvec for each frame to output
+                b->streamMVec(*this->writer);
+            }
+
+            // this->blocks[*]->expanded now has the expanded values from this->macroblocks
+            // Process them now again as IFrame
+            // + Write Prediction error IFrame after mvecs
+            for (MicroBlock* b : *this->blocks) {
+                // Expand previously encoded and decoded diffs back into self
+                // b->matrix was already replaced by ref_frame (copyBlockMatrixTo),
+                // b->expanded still contains decoded diffs, so just add back together.
+                b->expandDifferences();
+
+                // Write previously encoded RLE sequence to stream
+                b->streamEncoded(*this->writer, this->use_rle);
+            }
+        #endif
     }
 
     return true;

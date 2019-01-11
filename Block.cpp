@@ -231,16 +231,6 @@ void dc::Block<size>::createRLESequence(void) {
     info->data_bits = std::max(info->data_bits, util::ffs(uint32_t(info->data)));
 }
 
-template<size_t size>
-uint8_t* dc::Block<size>::getRow(size_t row) const {
-    return this->matrix[row];
-}
-
-template<size_t size>
-double* dc::Block<size>::getExpandedRow(size_t row) {
-    return &this->expanded[row * size];
-}
-
 /**
  *  @brief  Difference between this and other Block.
  *          Absolute substraction of every pixel, added together,
@@ -346,27 +336,6 @@ void dc::Block<size>::processFindMotionOffset(dc::Frame * const ref_frame) {
     // Expand diff with lowest_block to this->expanded
     this->expandDifferenceWith(*lowest_block);
     util::deallocVar(lowest_block);
-}
-
-template<size_t size>
-algo::MER_level_t dc::Block<size>::getCoord(void) const {
-    return this->mvec_this;
-}
-
-template<size_t size>
-bool dc::Block<size>::isDifferentCoord(const int16_t& x, const int16_t& y) const {
-    return this->mvec_this.x0 != x
-        || this->mvec_this.y0 != y;
-}
-
-template<size_t size>
-bool dc::Block<size>::isDifferentCoord(const algo::MER_level_t& other) const {
-    return this->isDifferentCoord(other.x0, other.y0);
-}
-
-template<size_t size>
-bool dc::Block<size>::isDifferentBlock(const dc::Block<dc::MacroBlockSize>& other) const {
-    return this->isDifferentCoord(other.getCoord());
 }
 
 /**
@@ -505,6 +474,8 @@ void dc::Block<size>::loadFromStream(util::BitStreamReader &reader, bool use_rle
 template<size_t size>
 void dc::Block<size>::loadFromReferenceStream(util::BitStreamReader& reader, dc::Frame * const ref_frame) {
     // Unused for size != dc::MacroBlockSize
+    (void)reader;
+    (void)ref_frame;
 }
 
 template<>
@@ -513,9 +484,10 @@ void dc::Block<dc::MacroBlockSize>::loadFromReferenceStream(util::BitStreamReade
     this->mvec.x0 = util::shift_signed<int16_t>(reader.get(dc::Frame::MVEC_BIT_SIZE), dc::Frame::MVEC_BIT_SIZE);
     this->mvec.y0 = util::shift_signed<int16_t>(reader.get(dc::Frame::MVEC_BIT_SIZE), dc::Frame::MVEC_BIT_SIZE);
 
+    const algo::MER_level_t mvec_coord = this->getCoordAfterMotion();
+
     // Get Macroblock in reference frame at location of motion offset
-    dc::MacroBlock *ref_block = ref_frame->getBlockAtCoord(this->mvec.x0 + this->mvec_this.x0,
-                                                           this->mvec.y0 + this->mvec_this.y0);
+    dc::MacroBlock *ref_block = ref_frame->getBlockAtCoord(mvec_coord.x0, mvec_coord.y0);
 
     // Copy values from reference block to this
     ref_block->copyBlockMatrixTo(*this);

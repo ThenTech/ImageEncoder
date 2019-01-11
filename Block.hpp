@@ -10,8 +10,8 @@ namespace dc {
      *  @brief  The size (width and height) for a Block inside an image.
      *          This is used everywhere and can be changed if needed.
      */
-    static constexpr size_t BlockSize      =  4u;
-    static constexpr size_t MacroBlockSize = 16u;
+    static constexpr uint16_t BlockSize      =  4u;
+    static constexpr uint16_t MacroBlockSize = 16u;
 
     class Frame;
 
@@ -48,17 +48,48 @@ namespace dc {
 
             // Macroblocks
             void updateRows(uint8_t *row_offset_list[]);
-            inline uint8_t* getRow(size_t) const;
-            inline double* getExpandedRow(size_t);
+
+            inline uint8_t* getRow(size_t row) const {
+                return this->matrix[row];
+            }
+
+            inline double* getExpandedRow(size_t row) {
+                return &this->expanded[row * size];
+            }
+
             size_t relativeAbsDifferenceWith(const dc::Block<dc::MacroBlockSize>&);
             void expandDifferenceWith(const dc::Block<dc::MacroBlockSize>&);
             void processFindMotionOffset(dc::Frame * const ref_frame);
-            inline algo::MER_level_t getCoord(void) const;
-            inline bool isDifferentCoord(const int16_t&, const int16_t&) const;
-            inline bool isDifferentCoord(const algo::MER_level_t&) const;
-            inline bool isDifferentBlock(const dc::Block<dc::MacroBlockSize>&) const;
+
+            inline algo::MER_level_t getCoord(void) const {
+                return this->mvec_this;
+            }
+
+            inline algo::MER_level_t getCoordAfterMotion(void) const {
+                return algo::MER_level_t {
+                    0,
+                    static_cast<int16_t>(this->mvec_this.x0 + this->mvec.x0),
+                    static_cast<int16_t>(this->mvec_this.y0 + this->mvec.y0),
+                    nullptr
+                };
+            }
+
+            inline bool isDifferentCoord(const int16_t& x, const int16_t& y) const {
+                return this->mvec_this.x0 != x
+                    || this->mvec_this.y0 != y;
+            }
+
+            inline bool isDifferentCoord(const algo::MER_level_t& other) const {
+                return this->isDifferentCoord(other.x0, other.y0);
+            }
+
+            inline bool isDifferentBlock(const dc::Block<dc::MacroBlockSize>& other) const  {
+                return this->isDifferentCoord(other.getCoord());
+            }
+
             void copyBlockMatrixTo(dc::Block<size>&) const;
             void loadFromReferenceStream(util::BitStreamReader&, dc::Frame * const);
+
 
             size_t streamSize(void) const;
             void streamEncoded(util::BitStreamWriter&, bool) const;

@@ -209,9 +209,9 @@ bool dc::ImageProcessor::processMacroBlocks(uint8_t * const source_block_buffer)
     util::Logger::WriteLn("[ImageProcessor] Creating macro blocks...");
     uint8_t *block_starts[dc::MacroBlockSize] = { nullptr };
 
-    constexpr size_t block_size = dc::MacroBlockSize * dc::MacroBlockSize;    ///< Total values inside 1 Block
-    const     size_t blockx     = this->width  / dc::MacroBlockSize;     ///< Amount of Blocks on a row
-    const     size_t blocky     = this->height / dc::MacroBlockSize;     ///< Amount of Blocks in a column
+    constexpr size_t block_size = dc::MacroBlockSize * dc::MacroBlockSize;  ///< Total values inside 1 Block
+    const     size_t blockx     = this->width  / dc::MacroBlockSize;        ///< Amount of Blocks on a row
+    const     size_t blocky     = this->height / dc::MacroBlockSize;        ///< Amount of Blocks in a column
 
     // Reserve space for blocks
     this->macroblocks->reserve(blockx * blocky);
@@ -253,11 +253,11 @@ dc::MacroBlock* dc::ImageProcessor::getBlockAtCoord(int16_t x, int16_t y) const 
     const int16_t b_x = std::clamp(x, int16_t(0), int16_t(this->width  - dc::MacroBlockSize));
     const int16_t b_y = std::clamp(y, int16_t(0), int16_t(this->height - dc::MacroBlockSize));
 
-    for (int16_t y = 0; y < dc::MacroBlockSize; y++) {       ///< Row inside block
-        block_starts[y] = (this->reader->get_buffer() +     // Buffer start
-                           (  ((b_y + y) * this->width)     // Block row start + Row within block
-                            + (b_x)                         // Block column start
-                          ));                               // Column withing block
+    for (int16_t row = 0; row < dc::MacroBlockSize; row++) {   ///< Row inside block
+        block_starts[row] = (this->reader->get_buffer() +      // Buffer start
+                           (  ((b_y + row) * this->width)      // Block row start + Row within block
+                            + (b_x)                            // Block column start
+                          ));                                  // Column withing block
     }
 
     return util::allocVar<dc::MacroBlock>(block_starts, b_x, b_y);
@@ -270,14 +270,9 @@ void dc::ImageProcessor::copyMacroblockToMatchingMicroblocks(dc::MacroBlock& mb)
     // For 4 micro and 16 macro size, 16 microblocks in macro, or 4x4 grid
     constexpr size_t micro_per_macro_row = (mblock_size / block_size) / dc::BlockSize;
 
-    const size_t mblockx = this->width  / dc::MacroBlockSize;  ///< Amount of Macro on a row
-    const size_t mblocky = this->height / dc::MacroBlockSize;  ///< Amount of Macro in a column
-
-    const size_t  blockx = this->width  / dc::BlockSize;       ///< Amount of Micro on a row
-    const size_t  blocky = this->height / dc::BlockSize;       ///< Amount of Micro in a column
-
-    const size_t    mb_x = size_t(mb.getCoord().x0) / dc::MacroBlockSize;  ///< Macro x idx
-    const size_t    mb_y = size_t(mb.getCoord().y0) / dc::MacroBlockSize;  ///< Macro y idx
+    const size_t blockx = this->width  / dc::BlockSize;  ///< Amount of Micro on a row
+    const size_t   mb_x = size_t(mb.getCoord().x0) / dc::MacroBlockSize;  ///< Macro x idx
+    const size_t   mb_y = size_t(mb.getCoord().y0) / dc::MacroBlockSize;  ///< Macro y idx
 
     // Micro at (x, y) = this->blocks[y * blockx + x]
     // Micro in first col of Macro at (mb_x, mb_y):
@@ -299,10 +294,15 @@ void dc::ImageProcessor::copyMacroblockToMatchingMicroblocks(dc::MacroBlock& mb)
                             dc::BlockSize,
                             row_start[x]->getExpandedRow(row));
             }
+
+            // Encode MicroBlock
+            row_start[x]->processDCTDivQ(this->quant_m.getData());
+            row_start[x]->createRLESequence();
+
+            // Decode MicroBlock so next p-frame can use this as new diff
+            row_start[x]->processIDCTMulQ(this->quant_m.getData());
         }
-
     }
-
 }
 
 /**

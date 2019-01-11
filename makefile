@@ -10,7 +10,7 @@ DECODER_DEF = -DDECODER
 # Extra options for encoder compilation
 # -DENABLE_HUFFMAN : Enable additional Huffman compression step
 # -DENABLE_OPENMP  : Enable Block parallelisation with OpenMP
-ECFLAGS =
+ECFLAGS = -DENABLE_HUFFMAN -DENABLE_OPENMP
 
 # Output folder for binaries
 OUTPUT = ./bin
