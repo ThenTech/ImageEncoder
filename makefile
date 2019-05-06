@@ -28,7 +28,7 @@ CC = g++-7
 CFLAGS = $(ECFLAGS) -std=c++17 -Wall -O3 -Wl,--strip-all,--gc-sections -fdata-sections -ffunction-sections -fopenmp
 
 # Default target
-TARGET   = $(TG_ENCODER)
+TARGET   = $(ENCODER_TGT)
 CODE_DEF = $(ENCODER_DEF)
 
 # Tools
